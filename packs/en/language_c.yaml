@@ -1,0 +1,661 @@
+# English wording for the C constructs in language/c.yaml.
+c:lang.kw.auto:
+  term: Let the compiler deduce a variable's type from its initialiser
+  intent: Stop writing out long iterator and lambda type names. Also used for return
+    type deduction on functions and, since C++20, as an abbreviated function template
+    parameter.
+  tags:
+  - types
+  - deduction
+  - readability
+  keys:
+    canonical: c.language.auto
+    symbolic:
+    - c:auto
+c:lang.kw.break:
+  term: Leave the innermost enclosing loop or switch immediately
+  intent: Stop looping early once the answer is found, or end a switch case.
+  tags:
+  - control-flow
+  - loops
+  keys:
+    canonical: c.language.break
+    symbolic:
+    - c:break
+c:lang.kw.case:
+  term: Label one branch of a switch statement
+  intent: Name the constant value that selects this branch of a switch.
+  tags:
+  - control-flow
+  - branching
+  keys:
+    canonical: c.language.case
+    symbolic:
+    - c:case
+c:lang.kw.char:
+  term: The narrow character type, one byte wide
+  intent: Hold a single byte or character. Signedness is implementation defined.
+  tags:
+  - types
+  - fundamental
+  - text
+  keys:
+    canonical: c.language.char
+    symbolic:
+    - c:char
+c:lang.kw.const:
+  term: Mark an object or member function as not modifying its target
+  intent: Promise not to change something, so the compiler enforces it and readers
+    can rely on it. On a member function it means "does not modify *this".
+  tags:
+  - types
+  - immutability
+  - correctness
+  keys:
+    canonical: c.language.const
+    symbolic:
+    - c:const
+c:lang.kw.continue:
+  term: Skip the rest of this loop iteration and start the next one
+  intent: Skip elements that fail a filter without nesting the body in an if.
+  tags:
+  - control-flow
+  - loops
+  keys:
+    canonical: c.language.continue
+    symbolic:
+    - c:continue
+c:lang.kw.default:
+  term: Label the fallback branch of a switch, or ask for a compiler-generated member
+  intent: Two unrelated uses -- the catch-all switch label, and "= default" asking
+    the compiler to generate the obvious constructor, destructor, or assignment.
+  tags:
+  - control-flow
+  - special-members
+  keys:
+    canonical: c.language.default
+    symbolic:
+    - c:default
+c:lang.kw.do:
+  term: Run a loop body once before testing the condition
+  intent: Loop where the body must execute at least one time.
+  tags:
+  - control-flow
+  - loops
+  keys:
+    canonical: c.language.do
+    symbolic:
+    - c:do
+c:lang.kw.double:
+  term: Double-precision binary floating-point type
+  intent: The default choice for real numbers.
+  tags:
+  - types
+  - fundamental
+  - math
+  keys:
+    canonical: c.language.double
+    symbolic:
+    - c:double
+c:lang.kw.else:
+  term: Provide the alternative branch of an if statement
+  intent: Do something different when the condition was false.
+  tags:
+  - control-flow
+  - branching
+  keys:
+    canonical: c.language.else
+    symbolic:
+    - c:else
+c:lang.kw.enum:
+  term: Define a type whose values are a fixed named set
+  intent: Replace magic numbers with named alternatives. Prefer "enum class" (C++11),
+    which is scoped and does not implicitly convert to int.
+  tags:
+  - types
+  - constants
+  keys:
+    canonical: c.language.enum
+    symbolic:
+    - c:enum
+c:lang.kw.extern:
+  term: Declare that a name is defined in another translation unit, or set linkage
+  intent: Refer to a global defined elsewhere, or with extern "C" give a function
+    C linkage so it can be called from C or loaded by name.
+  tags:
+  - linkage
+  - interop
+  - globals
+  keys:
+    canonical: c.language.extern
+    symbolic:
+    - c:extern
+c:lang.kw.float:
+  term: Single-precision binary floating-point type
+  intent: Half the memory of double, roughly seven significant digits.
+  tags:
+  - types
+  - fundamental
+  - math
+  keys:
+    canonical: c.language.float
+    symbolic:
+    - c:float
+c:lang.kw.for:
+  term: Loop with an initialiser, a condition, and a step; or iterate a range
+  intent: The workhorse loop. The range-for form (C++11) walks any container or range
+    without index arithmetic and is the form to reach for by default.
+  tags:
+  - control-flow
+  - loops
+  - iteration
+  keys:
+    canonical: c.language.for
+    symbolic:
+    - c:for
+c:lang.kw.goto:
+  term: Jump unconditionally to a label in the same function
+  intent: Rarely justified in C++; RAII and break/continue cover almost every case.
+    Occasionally used to escape deeply nested loops.
+  tags:
+  - control-flow
+  - discouraged
+  keys:
+    canonical: c.language.goto
+    symbolic:
+    - c:goto
+c:lang.kw.if:
+  term: Conditionally compile a region based on a constant expression
+  intent: 'Include or exclude code before the compiler sees it -- platform variants,
+    debug-only blocks, feature gates. Family: #if #ifdef #ifndef #elif #elifdef #elifndef
+    #else #endif.'
+  tags:
+  - preprocessor
+  - portability
+  - conditional-compilation
+  keys:
+    canonical: c.language.if
+    symbolic:
+    - c:if
+c:lang.kw.int:
+  term: The default signed integer type
+  intent: Whole numbers; at least 16 bits, in practice 32.
+  tags:
+  - types
+  - fundamental
+  keys:
+    canonical: c.language.int
+    symbolic:
+    - c:int
+c:lang.kw.long:
+  term: A longer signed integer type; "long long" is at least 64 bits
+  intent: Wider whole numbers. Prefer the fixed-width types in <cstdint> for portability.
+  tags:
+  - types
+  - fundamental
+  keys:
+    canonical: c.language.long
+    symbolic:
+    - c:long
+c:lang.kw.register:
+  term: Removed storage-class hint asking for a register. Do not use
+  intent: A vestigial optimisation hint; removed in C++17 and ignored long before
+    that.
+  tags:
+  - deprecated
+  - removed
+  - legacy
+  keys:
+    canonical: c.language.register
+    symbolic:
+    - c:register
+c:lang.kw.return:
+  term: Exit a function, optionally handing back a value
+  intent: Produce the function's result and stop executing it.
+  tags:
+  - control-flow
+  - functions
+  keys:
+    canonical: c.language.return
+    symbolic:
+    - c:return
+c:lang.kw.short:
+  term: A shorter signed integer type, at least 16 bits
+  intent: Small whole numbers where memory matters.
+  tags:
+  - types
+  - fundamental
+  keys:
+    canonical: c.language.short
+    symbolic:
+    - c:short
+c:lang.kw.signed:
+  term: Explicitly request a signed integer type
+  intent: Mostly used as "signed char", the only way to guarantee a signed byte.
+  tags:
+  - types
+  - fundamental
+  keys:
+    canonical: c.language.signed
+    symbolic:
+    - c:signed
+c:lang.kw.sizeof:
+  term: Yield the size in bytes of a type or expression
+  intent: Measure storage. "sizeof...(Pack)" counts the elements of a parameter pack.
+    Note it counts bytes, not array elements -- prefer std::size for that.
+  tags:
+  - memory
+  - introspection
+  - templates
+  keys:
+    canonical: c.language.sizeof
+    symbolic:
+    - c:sizeof
+c:lang.kw.static:
+  term: Give internal linkage, static storage duration, or class-level membership
+  intent: Three distinct meanings by context -- a file-local name, a variable that
+    persists across calls (initialised once, thread-safely since C++11), or a member
+    shared by all instances.
+  tags:
+  - linkage
+  - storage
+  - oop
+  keys:
+    canonical: c.language.static
+    symbolic:
+    - c:static
+c:lang.kw.struct:
+  term: Define a class type whose members default to public
+  intent: Conventionally used for plain aggregates of data with no invariant to protect.
+    Otherwise identical to class.
+  tags:
+  - types
+  - aggregates
+  keys:
+    canonical: c.language.struct
+    symbolic:
+    - c:struct
+c:lang.kw.switch:
+  term: Branch to one of many labelled cases on an integral or enum value
+  intent: Dispatch on a value. Cases fall through unless you break -- mark deliberate
+    fallthrough with [[fallthrough]].
+  tags:
+  - control-flow
+  - branching
+  keys:
+    canonical: c.language.switch
+    symbolic:
+    - c:switch
+c:lang.kw.typedef:
+  term: Give an existing type another name
+  intent: The older spelling of a type alias. Prefer "using", which reads left to
+    right and can itself be templated.
+  tags:
+  - types
+  - aliases
+  - legacy
+  keys:
+    canonical: c.language.typedef
+    symbolic:
+    - c:typedef
+c:lang.kw.union:
+  term: Define a type whose members all share the same storage
+  intent: Overlay several representations on one block of memory. Reading a member
+    other than the one last written is undefined; prefer std::variant, which tracks
+    which member is active.
+  tags:
+  - types
+  - memory
+  - low-level
+  keys:
+    canonical: c.language.union
+    symbolic:
+    - c:union
+c:lang.kw.unsigned:
+  term: Request a non-negative integer type with wraparound arithmetic
+  intent: 'Values that cannot be negative. Beware: mixing signed and unsigned in a
+    comparison converts the signed operand, and 0u - 1u wraps to a huge number.'
+  tags:
+  - types
+  - fundamental
+  keys:
+    canonical: c.language.unsigned
+    symbolic:
+    - c:unsigned
+c:lang.kw.void:
+  term: The incomplete type meaning "no value"; void* means "pointer to anything"
+  intent: Declare that a function returns nothing, or hold an untyped pointer.
+  tags:
+  - types
+  - fundamental
+  keys:
+    canonical: c.language.void
+    symbolic:
+    - c:void
+c:lang.kw.volatile:
+  term: Forbid the compiler from optimising away accesses to an object
+  intent: For memory-mapped hardware registers and signal handler state. It is NOT
+    a threading tool -- use std::atomic for that.
+  tags:
+  - low-level
+  - hardware
+  - misunderstood
+  keys:
+    canonical: c.language.volatile
+    symbolic:
+    - c:volatile
+c:lang.kw.while:
+  term: Repeat a body for as long as a condition holds, testing first
+  intent: Loop an unknown number of times, possibly zero.
+  tags:
+  - control-flow
+  - loops
+  keys:
+    canonical: c.language.while
+    symbolic:
+    - c:while
+c:lang.kw.inline:
+  term: Permit multiple identical definitions across translation units
+  intent: 'Primarily a linkage rule, not an optimisation hint: it is what lets a function
+    or (C++17) a variable be defined in a header without a duplicate symbol error
+    at link time.'
+  tags:
+  - linkage
+  - headers
+  keys:
+    canonical: c.language.inline
+    symbolic:
+    - c:inline
+c:lang.kw.restrict:
+  term: Promise that a pointer is the only way this object is reached
+  intent: Tells the compiler no other pointer will be used to access the same object
+    through this function, which unlocks optimisations it otherwise cannot make. If
+    the promise is false the behaviour is undefined.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.restrict
+    colloquial:
+    - only-pointer-to-this-object
+    - no-pointer-aliasing
+    - promise-no-overlap
+    symbolic:
+    - restrict
+c:lang.kw._Bool:
+  term: The boolean type, holding 0 or 1
+  intent: C's native boolean. <stdbool.h> spells it `bool`; in C23 `bool` is a keyword.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.bool
+    colloquial:
+    - true-or-false-value
+    symbolic:
+    - _Bool
+c:lang.kw._Complex:
+  term: A complex number type
+  intent: Real and imaginary parts. <complex.h> provides the arithmetic.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.complex
+    colloquial:
+    - complex-number
+    symbolic:
+    - _Complex
+c:lang.kw._Imaginary:
+  term: A purely imaginary number type
+  intent: Optional in the standard and rarely implemented.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.imaginary
+    colloquial:
+    - imaginary-number
+    symbolic:
+    - _Imaginary
+c:lang.ct.vla:
+  term: An array whose length is decided at run time
+  intent: The size is an ordinary variable rather than a constant. It lives on the
+    stack, so a large or attacker-controlled length can overflow it; many projects
+    ban it for that reason.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.variable-length-array
+    colloquial:
+    - array-sized-at-runtime
+    - stack-array-with-a-variable-size
+    symbolic:
+    - variable_length_array
+c:lang.ct.designated:
+  term: Initialise struct fields by name rather than position
+  intent: Fields not mentioned are zero-initialised, and reordering the struct cannot
+    silently reassign values.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.designated-initializer
+    colloquial:
+    - initialise-struct-fields-by-name
+    symbolic:
+    - designated_initializer
+c:lang.ct.compound_lit:
+  term: Create an unnamed object of a given type inline
+  intent: Builds a struct or array value in place, without declaring a variable for
+    it.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.compound-literal
+    colloquial:
+    - make-a-struct-value-inline
+    - unnamed-temporary-object
+    symbolic:
+    - compound_literal
+c:lang.kw._Alignas:
+  term: Force an object to a stricter memory alignment
+  intent: Used for hardware structures and to pad to a cache line so two threads do
+    not contend for the same line.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.alignas
+    colloquial:
+    - force-memory-alignment
+    - pad-to-a-cache-line
+    symbolic:
+    - _Alignas
+c:lang.kw._Alignof:
+  term: Query the required alignment of a type
+  intent: What byte boundary the type must sit on. Companion to sizeof.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.alignof
+    colloquial:
+    - alignment-of-a-type
+    symbolic:
+    - _Alignof
+c:lang.kw._Atomic:
+  term: Mark an object as safe for concurrent access
+  intent: 'Reads and writes become indivisible, so two threads cannot see a half-written
+    value. Not a lock: it protects one object, not an invariant across several.'
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.atomic
+    colloquial:
+    - make-a-variable-thread-safe
+    - indivisible-read-and-write
+    symbolic:
+    - _Atomic
+c:lang.kw._Generic:
+  term: Select an expression based on the type of a controlling expression
+  intent: C's compile-time type dispatch. It is how <tgmath.h> makes one name work
+    for float, double and long double, and it is the closest C has to overloading.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.generic
+    colloquial:
+    - type-based-dispatch
+    - compile-time-type-switch
+    - poor-mans-overloading
+    symbolic:
+    - _Generic
+c:lang.kw._Noreturn:
+  term: Declare that a function never returns to its caller
+  intent: For functions that always exit or abort. Lets the compiler drop the code
+    after the call.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.noreturn
+    colloquial:
+    - this-function-never-returns
+    symbolic:
+    - _Noreturn
+c:lang.kw._Static_assert:
+  term: Fail the compile if a constant condition is false
+  intent: Turns an assumption into a build error rather than a runtime surprise.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.static-assert
+    colloquial:
+    - check-a-condition-at-compile-time
+    - fail-the-build-if-wrong
+    symbolic:
+    - _Static_assert
+c:lang.kw._Thread_local:
+  term: Give each thread its own copy of a variable
+  intent: Per-thread state without locking. Each thread gets its own instance.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.thread-local
+    colloquial:
+    - one-copy-per-thread
+    - thread-private-variable
+    symbolic:
+    - _Thread_local
+c:lang.kw.typeof:
+  term: Yield the type of an expression
+  intent: Names a type you cannot spell, without evaluating the expression. C23 standardised
+    what was long a GNU extension.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.typeof
+    colloquial:
+    - get-the-type-of-an-expression
+    symbolic:
+    - typeof
+c:lang.kw.constexpr:
+  term: Allow a value or function to be evaluated at compile time
+  intent: Move work from run time to build time. A constexpr variable is a true compile-time
+    constant usable as an array bound or template argument; a constexpr function may
+    still be called at run time when its arguments are not constant.
+  tags:
+  - compile-time
+  - performance
+  keys:
+    canonical: c.language.constexpr
+    symbolic:
+    - c:constexpr
+c:lang.kw.nullptr:
+  term: The typed null pointer literal
+  intent: Replaces NULL and 0. Because it has its own type, it never accidentally
+    selects an int overload.
+  tags:
+  - pointers
+  - literals
+  - correctness
+  keys:
+    canonical: c.language.nullptr
+    symbolic:
+    - c:nullptr
+c:lang.kw.true:
+  term: The boolean literal for "yes"
+  intent: The true value of type bool.
+  tags:
+  - literals
+  - fundamental
+  keys:
+    canonical: c.language.true
+    symbolic:
+    - c:true
+c:lang.kw.false:
+  term: The boolean literal for "no"
+  intent: The false value of type bool.
+  tags:
+  - literals
+  - fundamental
+  keys:
+    canonical: c.language.false
+    symbolic:
+    - c:false
+c:lang.kw.bool:
+  term: The built-in boolean type, holding true or false
+  intent: Represent a yes/no condition.
+  tags:
+  - types
+  - fundamental
+  keys:
+    canonical: c.language.bool
+    symbolic:
+    - c:bool
+c:lang.kw.static_assert:
+  term: Fail the compile if a constant condition is false
+  intent: Turn an assumption into a build error with your own message, rather than
+    a runtime surprise. The message is optional since C++17.
+  tags:
+  - compile-time
+  - correctness
+  - diagnostics
+  keys:
+    canonical: c.language.static-assert
+    symbolic:
+    - c:static_assert
+c:lang.kw.thread_local:
+  term: Give each thread its own independent copy of a variable
+  intent: Per-thread state without locking -- scratch buffers, random engines, error
+    context. Each thread gets its own instance, destroyed when the thread ends.
+  tags:
+  - concurrency
+  - storage
+  - thread-safety
+  keys:
+    canonical: c.language.thread-local
+    symbolic:
+    - c:thread_local
+c:lang.kw._BitInt:
+  term: An integer of an exact, caller-chosen bit width
+  intent: _BitInt(12) is exactly 12 bits. Useful for hardware registers and bitfield
+    protocols where the width is fixed by something outside the language.
+  tags:
+  - c
+  - language
+  keys:
+    canonical: c.language.bitint
+    colloquial:
+    - integer-of-an-exact-width
+    - n-bit-integer
+    symbolic:
+    - _BitInt

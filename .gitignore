@@ -1,0 +1,11 @@
+# Build artifacts — rebuildable from source with `make`
+out/
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Environment
+.venv/
+__pycache__/
+*.pyc

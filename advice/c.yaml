@@ -1,0 +1,14 @@
+# Advice for code being written in C.
+#
+# Deliberately NOT a copy of the C++ set. malloc is how you allocate in C and
+# is not advised against; strcpy is still a hazard, but the honest remedy is
+# snprintf, not std::string. Same hazard, different remedy.
+- {from: gets,    to: fgets,    severity: obsolete, key: c_gets_removed}
+- {from: strcpy,  to: snprintf, severity: unsafe,   key: c_unbounded_copy}
+- {from: strcat,  to: snprintf, severity: unsafe,   key: c_unbounded_copy}
+- {from: sprintf, to: snprintf, severity: unsafe,   key: c_unbounded_format}
+- {from: atoi,    to: strtol,   severity: unsafe,   key: c_silent_parse}
+- {from: atof,    to: strtod,   severity: unsafe,   key: c_silent_parse}
+- {from: strtok,  to: strtok_r, severity: unsafe,   key: c_not_reentrant}
+- {from: malloc,  to: calloc,   severity: prefer,   key: c_check_and_zero}
+- {from: realloc, to: realloc,  severity: prefer,   key: c_realloc_aliasing}

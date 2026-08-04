@@ -1,0 +1,158 @@
+# The WORDS of each piece of advice, in English. A pack may rewrite every line
+# here without changing which declaration supersedes which.
+manual_memory:
+  headline: "This works, but modern C++ can manage this memory for you."
+  rationale: >-
+    Manual allocation means every path out of the function -- including the ones
+    an exception takes -- has to release exactly once. std::vector and
+    std::make_unique do that automatically, and they cannot be freed twice or
+    forgotten. Reach for the manual form only when a C API demands a raw
+    pointer.
+unbounded_copy:
+  headline: "This works, but it will overrun the destination if the source is longer."
+  rationale: >-
+    These functions write until they find a terminating null and never check how
+    much room they were given, so a longer-than-expected input writes past the
+    end of the buffer. std::string grows to fit and tracks its own length.
+unbounded_format:
+  headline: "This works, but it cannot know how big the destination is."
+  rationale: >-
+    Formatting into a fixed buffer overruns it whenever the result is longer
+    than expected. std::format returns a string sized to the result; snprintf
+    is the C-compatible middle ground.
+shared_state:
+  headline: "This works, but it keeps hidden state between calls."
+  rationale: >-
+    It stores its position in a static buffer, so two pieces of code splitting
+    strings at the same time interfere with each other, and it modifies the
+    string you pass in. Range-based splitting has neither problem.
+silent_parse_failure:
+  headline: "This works, but it cannot tell you the text was not a number."
+  rationale: >-
+    On invalid input it returns 0 -- indistinguishable from the text "0" -- and
+    on overflow the behaviour is undefined. std::from_chars reports exactly
+    where parsing stopped and why.
+weak_random:
+  headline: "This works, but the numbers are poor quality and awkward to bound."
+  rationale: >-
+    The classic rand() % n is biased unless n divides the range evenly, and the
+    generator is weak. The <random> facilities give a proper generator and a
+    distribution that handles bounds correctly.
+untyped_callback:
+  headline: "This works, but the compiler cannot check the comparison."
+  rationale: >-
+    It compares through void pointers, so a mismatched type is a run-time bug
+    rather than a build error, and the indirect call cannot be inlined.
+    std::sort is type-checked and usually faster.
+raw_bytes:
+  headline: "This works for trivially copyable types, but not for objects."
+  rationale: >-
+    Copying raw bytes skips constructors, so doing it to a type that owns a
+    resource -- a string, a vector, anything with a pointer -- produces two
+    objects believing they own the same thing. std::copy calls the real copy.
+unchecked_format:
+  headline: "This works, but the format string is not checked against the arguments."
+  rationale: >-
+    A mismatch between the format specifier and the argument is undefined
+    behaviour, and it is only caught if your compiler happens to warn.
+    std::format checks at compile time.
+prefer_lambda:
+  headline: "This works, but a lambda is usually clearer and faster here."
+  rationale: >-
+    Bind expressions are hard to read, interact badly with overloads, and often
+    prevent inlining. A lambda expresses the same intent directly.
+
+subscript_inserts:
+  headline: "This works, but reading a missing key silently INSERTS it."
+  rationale: >-
+    operator[] default-constructs a value when the key is absent, so a lookup
+    that was only meant to read quietly grows the map -- and it cannot be used
+    on a const map at all. Use at() to throw on a missing key, find() to test
+    for one, or contains() when you only need yes or no.
+unchecked_index:
+  headline: "This works, but an out-of-range index is undefined behaviour."
+  rationale: >-
+    operator[] performs no bounds check: a bad index reads or writes memory
+    that is not yours, and may appear to work in testing. at() throws
+    std::out_of_range instead. Use operator[] when the index is already known
+    good and the check is measurably too expensive.
+empty_access:
+  headline: "This works, but calling it on an empty container is undefined behaviour."
+  rationale: >-
+    front() and back() do not check whether anything is there. On an empty
+    container the reference is invalid and using it is undefined. Guard with
+    empty() first.
+optional_throws:
+  headline: "This works, but throws if the optional is empty."
+  rationale: >-
+    value() raises std::bad_optional_access when there is nothing held. If a
+    sensible fallback exists, value_or() states it directly; otherwise check
+    has_value() before calling.
+default_unique:
+  headline: "This works, but shared ownership is rarely what you need."
+  rationale: >-
+    shared_ptr carries an atomic reference count on every copy and destruction,
+    and cycles of shared_ptr leak because neither end ever reaches zero. Prefer
+    unique_ptr and reach for shared_ptr only when ownership is genuinely
+    shared and its end is genuinely unpredictable.
+endl_flushes:
+  headline: "This works, but it flushes the stream every time."
+  rationale: >-
+    std::endl writes a newline AND forces a flush. In a loop that turns
+    buffered output into one system call per line, which can be orders of
+    magnitude slower. Write '\n' for the newline and flush deliberately when
+    you actually need the output to appear.
+move_in_template:
+  headline: "This works, but in a template it may move something you did not own."
+  rationale: >-
+    std::move on a forwarding reference (T&&) casts unconditionally, so an
+    lvalue the caller still intends to use gets moved from. std::forward
+    preserves whatever the caller passed. Outside templates std::move is
+    correct.
+c_gets_removed:
+  headline: "This was REMOVED from the C standard in C11. Do not use it."
+  rationale: >-
+    gets() has no way to know how large the destination is, so any input longer
+    than the buffer overruns it. There is no safe way to call it, which is why
+    the standard deleted it outright. fgets() takes the buffer size.
+c_unbounded_copy:
+  headline: "This works, but it will overrun the destination if the source is longer."
+  rationale: >-
+    It copies until it finds a terminating null and never checks how much room
+    it was given. snprintf(dst, sizeof dst, "%s", src) bounds the write and
+    always null-terminates. strncpy bounds it too, but does NOT guarantee a
+    terminator when the source fills the buffer -- a common second bug.
+c_unbounded_format:
+  headline: "This works, but it cannot know how big the destination is."
+  rationale: >-
+    sprintf writes as much as the formatted result needs, whatever the buffer
+    can hold. snprintf takes the size and truncates instead of overrunning; it
+    also returns the length the result WOULD have needed, so you can detect
+    truncation.
+c_silent_parse:
+  headline: "This works, but it cannot tell you the text was not a number."
+  rationale: >-
+    On invalid input it returns 0, which is indistinguishable from parsing the
+    text \"0\", and on overflow the behaviour is undefined. strtol sets endptr
+    to where it stopped and errno to ERANGE on overflow, so failure is
+    detectable.
+c_not_reentrant:
+  headline: "This works, but it keeps hidden state between calls."
+  rationale: >-
+    strtok stores its position in a static buffer, so two loops tokenising at
+    the same time -- or one in a signal handler or thread -- corrupt each
+    other. It also writes nulls into the string you pass. strtok_r takes the
+    saved position as an argument instead.
+c_check_and_zero:
+  headline: "This is correct C. Two things are easy to get wrong."
+  rationale: >-
+    The block is uninitialised, so reading it before writing is undefined; and
+    malloc returns NULL when it fails, which must be checked before use. calloc
+    zeroes the memory and checks its own multiplication for overflow, so it is
+    often the safer default when you are allocating an array.
+c_realloc_aliasing:
+  headline: "This is correct C, but assigning the result to the same pointer leaks."
+  rationale: >-
+    If realloc fails it returns NULL and leaves the original block allocated.
+    Writing p = realloc(p, n) discards the only pointer to that block, so a
+    failure leaks it. Assign to a temporary, check it, then commit.

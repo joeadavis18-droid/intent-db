@@ -1,0 +1,141 @@
+# intent_db — a bidirectional lexicon of programming intent
+
+Look up a function by **what you are trying to do**, and read existing code back
+as **what it means**.
+
+```
+$ intentq "grab some memory"
+malloc  <cstdlib>  [C++98]
+  PREFER  This works, but modern C++ can manage this memory for you.  -> std::make_unique
+  means   allocate a block of uninitialised memory
+
+$ intentq --lang c "grab some memory"
+malloc  <stdlib.h>  [C89]
+  PREFER  This is correct C. Two things are easy to get wrong.  -> calloc
+  means   allocate a block of uninitialised memory
+```
+
+…and the same lexicon in reverse:
+
+```
+$ explain --semantic main.cpp
+   5  sequence.push.at-end     append an element to the end of `v` (3)
+   7  sequence.sort            sort `v` into ascending order
+  10  memory.allocate-memory   allocate a block of uninitialised memory for 64 bytes
+```
+
+## Why
+
+Most references are organised by **spelling**. You have to already know the
+thing is called `std::lower_bound` before you can look it up. That is backwards
+for the person who most needs the answer.
+
+This is organised by **intent**. Say it any way you like — `"grab some memory"`,
+`"reserve storage"`, `"set aside memory for"` — and get one precise answer back.
+Broad on the way in, exact on the way out.
+
+## What is in it
+
+| | |
+|---|---|
+| declarations | **15,740** — C++ (libstdc++ 14 + libc++ 18) and C (glibc) |
+| concepts | **8,820** language-neutral operations |
+| semantic keys | **222,727** ways to ask for them |
+| canvas ports | **27,101** typed sockets |
+| parameter prompts | **16,127** |
+| advisory edges | 76, across 2 dialects |
+
+Everything mechanical is derived from the compiler rather than hand-typed:
+signatures, parameter roles, and `std_since` all come from parsing real headers
+with libclang at each `-std=` level.
+
+## Design
+
+Three axes, deliberately independent:
+
+| axis | example | answers |
+|---|---|---|
+| **concept** | `sequence.sort` | *what is being done* |
+| **programming language** | `cpp`, `c` | *what implements it* |
+| **human language** | `en`, … | *what it is called* |
+
+One `concept` row, many bindings. `memory.allocate-memory` binds to `malloc` in
+`<stdlib.h>` for C and `<cstdlib>` for C++, with different advice for each —
+because `malloc` is simply correct in C and usually a smell in modern C++.
+
+```
+data/raw_decls*.jsonl      the compiler scan — language-neutral
+      │
+      ├── out/base.db      declarations · parameters · roles · ports · emit templates
+      │
+      └── out/pack_en.db   concepts · canonical terms · 222k aliases · prompts
+```
+
+`base.db` is built once and shared. A **language pack** is a complete
+bidirectional lexicon for one human language, authored against the declarations
+— never translated from another pack, so it does not inherit how English
+happened to carve up the concept space. See
+[`packs/PACK_CONTRACT.md`](packs/PACK_CONTRACT.md).
+
+### Versions are columns, not branches
+
+Standard version and implementation are recorded per declaration, so one
+database answers every targeting question by query:
+
+```sql
+-- what can I use if I target C++17?
+SELECT * FROM entry WHERE std_since IN ('C++98','C++11','C++14','C++17');
+
+-- what exists only in libc++?
+SELECT qualified_name FROM entry WHERE impl = 'libc++';
+```
+
+No parallel trees to keep in sync.
+
+### Aliases are loose; the canonical term is not
+
+Aliases exist so input can be broad. The canonical term is the opposite
+obligation: exactly one precise phrase per concept, stored separately, and it is
+what the system says back. `std::vector::push_back` has 141 aliases and one
+term — *"append an element to the end of a sequence"*.
+
+## Build
+
+```bash
+python3 -m venv .venv
+./.venv/bin/pip install libclang sqlite-vec model2vec pyyaml
+make scan     # parse the standard libraries      (~5 min, needs clang)
+make          # build base.db + pack_en.db, embed, lint
+./.venv/bin/python tools/query.py "sort a vector"
+```
+
+Requires clang 18 and GCC 14 headers; libc++ 18 optionally, for `<mdspan>`.
+
+## Where it needs help
+
+This is the part that does not parallelise inside one head:
+
+- **Semantic phrasings.** 222k aliases sounds like a lot; it is ~25 per concept
+  and generated from templates. Phrasings real people actually type beat
+  anything a template produces.
+- **Canonical terms.** Only **255 of 8,820** are hand-declared. The rest are
+  derived, and they get thin in the tail.
+- **Missed coverage.** `<flat_map>` needs GCC 15 / libc++ 19. Beyond that, if
+  something you expect is absent, that is a bug worth filing.
+- **Language packs.** Czech, Japanese, anything. Someone who thinks in their own
+  language should not have to think in English first.
+- **Advisory edges.** 76 is a start. The valuable ones are the C++-on-C++ cases
+  that bite people who believe they are already writing safe code.
+
+## Status
+
+Honest about what is unfinished:
+
+- Reverse lookup uses regex, not a parser — fine for the examples above, will
+  misresolve on real files with `auto` and templates.
+- No composition: `find` followed by `if (it != end())` is one intent reported
+  as two.
+- Rust and Python are planned, not started.
+- Retrieval: top-1 63%, top-5 80%, phrasing agreement 92% (`tools/eval.py`).
+
+Licensed Apache-2.0.

@@ -1,0 +1,8 @@
+locale: en
+name: English
+version: 1
+# What this pack asserts: given the SHARED scan (declarations, ports, roles,
+# effects), these tables produce an English concept partition, an English
+# canonical term per concept, and English aliases. Nothing here is derived from
+# another pack, and no other pack derives from this one.
+authored_from: raw_decls.jsonl

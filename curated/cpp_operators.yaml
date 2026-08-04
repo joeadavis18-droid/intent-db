@@ -1,0 +1,357 @@
+# Operators and punctuators. `params` here describe OPERANDS, which is why the
+# param table carries a `role` rather than only a type.
+
+- uid: cpp:lang.op.spaceship
+  kind: operator
+  name: operator<=>
+  domain: language
+  std_since: C++20
+  summary: Three-way comparison, yielding less / equal / greater in one operation.
+  intent: >-
+    Define ordering once and get <, >, <=, >= generated for free. Defaulting it
+    alongside operator== gives a type full comparison support in two lines.
+  tags: [operators, comparison, ordering]
+  params:
+    - {ordinal: 0, name: lhs, type: const T&, role: value, semantic: compare.left}
+    - {ordinal: 1, name: rhs, type: const T&, role: value, semantic: compare.right}
+  keys:
+    canonical: language.operator.three-way-compare
+    colloquial: [compare-two-objects-in-one-go, get-all-comparisons-for-free,
+                 make-my-type-sortable, define-ordering-once]
+    question: [how-do-i.make-my-class-comparable]
+    problem: [i-am-writing-six-comparison-operators-by-hand]
+    symbolic: ["<=>", "operator<=>"]
+
+- uid: cpp:lang.op.subscript
+  kind: operator
+  name: 'operator[]'
+  domain: language
+  std_since: C++98
+  summary: Access an element by index or key.
+  intent: >-
+    Unchecked on vector and array -- an out-of-range index is undefined
+    behaviour, so use at() when the index is not already known good. On map it
+    INSERTS a default-constructed value when the key is absent.
+  tags: [operators, access, containers]
+  params:
+    - {ordinal: 0, name: index, type: size_type, role: position, semantic: at.index}
+  keys:
+    canonical: language.operator.subscript
+    colloquial: [get-an-element-by-index, index-into-a-container, look-up-by-key]
+    question: [how-do-i.access-an-element-by-index]
+    problem: [map-square-brackets-inserted-a-key-i-only-wanted-to-read]
+    symbolic: ["[]", "operator[]"]
+
+- uid: cpp:lang.op.call
+  kind: operator
+  name: 'operator()'
+  domain: language
+  std_since: C++98
+  summary: Make an object callable like a function.
+  intent: >-
+    Turns a class into a function object -- a stateful callable that inlines far
+    better than a function pointer, and the mechanism lambdas are built on.
+  tags: [operators, callables, functors]
+  keys:
+    canonical: language.operator.function-call
+    colloquial: [make-my-object-callable, write-a-functor,
+                 a-callable-that-carries-state]
+    question: [how-do-i.make-a-class-callable]
+    symbolic: ["()", "operator()"]
+
+- uid: cpp:lang.op.arrow
+  kind: operator
+  name: operator->
+  domain: language
+  std_since: C++98
+  summary: Access a member through a pointer or pointer-like object.
+  intent: >-
+    Dereference and select in one step. Overloading it is what makes smart
+    pointers and iterators feel like raw pointers; the compiler chains calls
+    until it reaches a real pointer.
+  tags: [operators, pointers, access]
+  keys:
+    canonical: language.operator.member-through-pointer
+    colloquial: [get-a-member-through-a-pointer, make-my-wrapper-act-like-a-pointer]
+    question: [how-do-i.write-a-smart-pointer]
+    symbolic: ["->", "operator->", "->*"]
+
+- uid: cpp:lang.op.dereference
+  kind: operator
+  name: operator*
+  domain: language
+  std_since: C++98
+  summary: Dereference a pointer or iterator to reach the object it refers to.
+  intent: Get at the value behind a pointer, iterator, optional, or smart pointer.
+  tags: [operators, pointers, iterators]
+  keys:
+    canonical: language.operator.dereference
+    colloquial: [get-the-value-a-pointer-points-at, follow-the-pointer,
+                 read-through-an-iterator]
+    problem: [dereferencing-a-null-pointer-crashes]
+    symbolic: ["*", "operator*"]
+
+- uid: cpp:lang.op.address_of
+  kind: operator
+  name: operator&
+  domain: language
+  std_since: C++98
+  summary: Take the address of an object, yielding a pointer to it.
+  intent: >-
+    Obtain a pointer. If the type overloads operator&, use std::addressof to get
+    the real address anyway.
+  tags: [operators, pointers, memory]
+  keys:
+    canonical: language.operator.address-of
+    colloquial: [get-a-pointer-to-this-object, take-the-address]
+    symbolic: ["&", "operator&"]
+
+- uid: cpp:lang.op.scope
+  kind: punctuator
+  name: '::'
+  domain: language
+  std_since: C++98
+  summary: Qualify a name with the namespace, class, or enum it belongs to.
+  intent: >-
+    Say exactly which entity you mean. A leading :: refers to the global
+    namespace, which resolves ambiguity against a local name.
+  tags: [naming, scope]
+  keys:
+    canonical: language.naming.scope-resolution
+    colloquial: [say-which-namespace-a-name-is-in, qualify-a-name,
+                 refer-to-the-global-version]
+    problem: [ambiguous-name-between-my-code-and-std]
+    symbolic: ["::"]
+
+- uid: cpp:lang.op.ternary
+  kind: operator
+  name: 'operator?:'
+  domain: language
+  std_since: C++98
+  summary: Select between two expressions based on a condition.
+  intent: >-
+    An if that is an expression rather than a statement -- so it can initialise
+    a const variable or a member in a constructor's init list.
+  tags: [operators, control-flow, expressions]
+  params:
+    - {ordinal: 0, name: condition, type: bool, role: predicate, semantic: test.condition}
+    - {ordinal: 1, name: if_true, type: T, role: value, semantic: branch.true}
+    - {ordinal: 2, name: if_false, type: T, role: value, semantic: branch.false}
+  keys:
+    canonical: language.operator.conditional-expression
+    colloquial: [pick-one-of-two-values, inline-if, one-line-if-else,
+                 initialise-a-const-conditionally]
+    question: [how-do-i.initialise-a-const-variable-conditionally]
+    symbolic: ["?:", "?"]
+
+- uid: cpp:lang.op.comma
+  kind: operator
+  name: 'operator,'
+  domain: language
+  std_since: C++98
+  summary: Evaluate the left expression, discard it, and yield the right.
+  intent: >-
+    Sequences two expressions where only one is allowed. Rare and easily
+    confused with an argument separator.
+  tags: [operators, sequencing, obscure]
+  keys:
+    canonical: language.operator.comma-sequence
+    colloquial: [do-two-things-where-only-one-expression-fits]
+    symbolic: [","]
+
+- uid: cpp:lang.op.arithmetic
+  kind: operator
+  name: operator+
+  domain: language
+  std_since: C++98
+  summary: 'Arithmetic operators: + - * / % and unary + -.'
+  intent: >-
+    Numeric computation. Integer division truncates toward zero, % is remainder
+    (not modulo -- it keeps the sign of the dividend), and signed overflow is
+    undefined behaviour.
+  tags: [operators, math, arithmetic]
+  params:
+    - {ordinal: 0, name: lhs, type: T, role: value, semantic: operand.left}
+    - {ordinal: 1, name: rhs, type: T, role: value, semantic: operand.right}
+  keys:
+    canonical: language.operator.arithmetic
+    colloquial: [add-two-numbers, subtract, multiply, divide, get-the-remainder]
+    question: [how-do-i.get-the-remainder-of-a-division]
+    problem: [integer-division-truncated-my-result,
+              modulo-of-a-negative-number-is-negative]
+    symbolic: ["+", "-", "*", "/", "%"]
+
+- uid: cpp:lang.op.comparison
+  kind: operator
+  name: operator==
+  domain: language
+  std_since: C++98
+  summary: 'Comparison operators: == != < > <= >=.'
+  intent: >-
+    Test equality and ordering. Since C++20 a defaulted operator== compares
+    members pairwise, and != is generated from it automatically.
+  tags: [operators, comparison]
+  params:
+    - {ordinal: 0, name: lhs, type: const T&, role: value, semantic: compare.left}
+    - {ordinal: 1, name: rhs, type: const T&, role: value, semantic: compare.right}
+  keys:
+    canonical: language.operator.comparison
+    colloquial: [check-if-two-things-are-equal, test-equality, compare-two-values]
+    question: [how-do-i.compare-two-objects-for-equality]
+    problem: [comparing-floats-with-double-equals-is-unreliable]
+    symbolic: ["==", "!=", "<", ">", "<=", ">="]
+
+- uid: cpp:lang.op.logical
+  kind: operator
+  name: operator&&
+  domain: language
+  std_since: C++98
+  summary: 'Logical operators: && || ! with short-circuit evaluation.'
+  intent: >-
+    Combine boolean tests. && and || short-circuit -- the right operand is not
+    evaluated if the left already decides the answer, which is what makes
+    "p && p->ok()" safe.
+  tags: [operators, logic, control-flow]
+  keys:
+    canonical: language.operator.logical
+    colloquial: [combine-two-conditions, logical-and, logical-or, negate-a-condition,
+                 short-circuit-a-null-check]
+    question: [how-do-i.check-a-pointer-before-dereferencing-it]
+    symbolic: ["&&", "||", "!"]
+
+- uid: cpp:lang.op.bitwise
+  kind: operator
+  name: operator|
+  domain: language
+  std_since: C++98
+  summary: 'Bitwise operators: & | ^ ~ << >>.'
+  intent: >-
+    Manipulate individual bits -- flag sets, masks, packing. Shifting by more
+    than the width, or shifting a negative value left, is undefined.
+  tags: [operators, bits, low-level, flags]
+  keys:
+    canonical: language.operator.bitwise
+    colloquial: [set-a-bit, clear-a-bit, test-a-flag, mask-off-some-bits,
+                 shift-bits-left, combine-flags]
+    question: [how-do-i.check-whether-a-flag-is-set]
+    problem: [my-shift-overflowed-the-type-width]
+    symbolic: ["&", "|", "^", "~", "<<", ">>"]
+
+- uid: cpp:lang.op.assignment
+  kind: operator
+  name: operator=
+  domain: language
+  std_since: C++98
+  summary: 'Assignment and compound assignment: = += -= *= /= %= &= |= ^= <<= >>=.'
+  intent: >-
+    Overwrite a value. A user-defined copy assignment must be safe when an
+    object is assigned to itself; the copy-and-swap idiom gets that for free.
+  tags: [operators, assignment, special-members]
+  keys:
+    canonical: language.operator.assign
+    colloquial: [overwrite-a-value, add-and-assign-in-one-step,
+                 write-a-copy-assignment-operator]
+    question: [how-do-i.write-a-safe-assignment-operator]
+    problem: [self-assignment-corrupted-my-object]
+    symbolic: ["=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>="]
+
+- uid: cpp:lang.op.increment
+  kind: operator
+  name: operator++
+  domain: language
+  std_since: C++98
+  summary: 'Increment and decrement: ++x, x++, --x, x--.'
+  intent: >-
+    Step a number or iterator by one. Prefer the prefix form for iterators --
+    postfix must copy the old value to return it.
+  tags: [operators, iterators, arithmetic]
+  keys:
+    canonical: language.operator.increment
+    colloquial: [add-one, step-an-iterator-forward, count-up-by-one]
+    problem: [postfix-increment-on-an-iterator-is-slower-than-prefix]
+    symbolic: ["++", "--"]
+
+- uid: cpp:lang.op.stream
+  kind: operator
+  name: operator<<
+  domain: language
+  std_since: C++98
+  summary: Stream insertion and extraction, when applied to a stream.
+  intent: >-
+    Write to or read from a stream. Overloading operator<< for your own type is
+    the conventional way to make it printable.
+  tags: [operators, io, streams]
+  params:
+    - {ordinal: 0, name: os, type: std::ostream&, role: stream, semantic: io.out}
+    - {ordinal: 1, name: value, type: const T&, role: value, semantic: the.value}
+  keys:
+    canonical: language.operator.stream-insertion
+    colloquial: [print-my-type, make-my-class-printable, write-to-a-stream,
+                 read-from-a-stream]
+    question: [how-do-i.print-my-own-class-with-cout]
+    symbolic: ["<<", ">>", "operator<<", "operator>>"]
+
+- uid: cpp:lang.op.lambda
+  kind: punctuator
+  name: lambda
+  domain: language
+  std_since: C++11
+  summary: An unnamed function object written inline, with an explicit capture list.
+  intent: >-
+    Pass behaviour to an algorithm without writing a separate function. The
+    capture list is the whole design: [=] copies, [&] refers (and dangles if the
+    lambda outlives the scope), [x] captures one thing by name.
+  tags: [callables, lambdas, closures]
+  params:
+    - {ordinal: 0, name: captures, type: capture-list, role: policy,
+       semantic: closure.captures,
+       doc: "[] nothing, [=] by copy, [&] by reference, [this], [x = expr] init-capture"}
+    - {ordinal: 1, name: params, type: parameter-list, role: input,
+       semantic: closure.parameters}
+    - {ordinal: 2, name: body, type: compound-statement, role: callable,
+       semantic: closure.body}
+  keys:
+    canonical: language.callable.lambda
+    colloquial: [write-an-inline-function, pass-a-function-to-an-algorithm,
+                 make-a-closure, define-a-comparator-inline]
+    question: [how-do-i.pass-a-custom-comparator-to-sort]
+    problem: [my-lambda-captured-by-reference-and-dangled]
+    symbolic: ["[]() {}", "lambda"]
+
+- uid: cpp:lang.op.braced_init
+  kind: punctuator
+  name: braced-initialisation
+  domain: language
+  std_since: C++11
+  summary: Initialise with braces, forbidding narrowing conversions.
+  intent: >-
+    Uniform initialisation. It rejects silent narrowing (int x{3.5} will not
+    compile) and sidesteps the most vexing parse -- but beware that any type
+    with an initializer_list constructor prefers it, which is why
+    vector<int>{3, 1} holds two elements rather than three ones.
+  tags: [initialisation, correctness]
+  keys:
+    canonical: language.init.braced
+    colloquial: [initialise-with-braces, stop-narrowing-conversions,
+                 uniform-initialisation, avoid-the-most-vexing-parse]
+    question: [how-do-i.prevent-silent-narrowing-in-initialisation]
+    problem: [vector-braces-gave-me-the-wrong-number-of-elements,
+              my-declaration-was-parsed-as-a-function]
+    symbolic: ["{}", "{ }"]
+
+- uid: cpp:lang.op.ellipsis
+  kind: punctuator
+  name: parameter-pack
+  domain: language
+  std_since: C++11
+  summary: Declare or expand a variadic template parameter pack.
+  intent: >-
+    Accept any number of arguments of any types. Expanded with pattern...,
+    counted with sizeof...(Pack), and folded with a fold expression (C++17).
+  tags: [templates, variadic, generics]
+  keys:
+    canonical: language.template.parameter-pack
+    colloquial: [take-any-number-of-arguments, variadic-template,
+                 forward-all-arguments-along, fold-over-arguments]
+    question: [how-do-i.write-a-function-taking-any-number-of-arguments]
+    symbolic: ["...", "Args...", "sizeof...", "fold expression"]

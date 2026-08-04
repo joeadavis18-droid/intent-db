@@ -1,0 +1,66 @@
+# C language constructs. Structural only; the words live in each pack.
+#
+# Deliberately NOT a copy of language/cpp.yaml. C's keyword set diverges: it
+# has restrict, _Generic, _Atomic and variably-modified types that C++ lacks,
+# and lacks class, template, namespace, references and everything built on
+# them. A construct present in both is still listed here, because the C entry
+# is a different declaration with its own standard version.
+- {uid: "c:lang.kw.auto",        name: auto,        kind: keyword, since: C89, syntax: auto}
+- {uid: "c:lang.kw.break",       name: break,       kind: keyword, since: C89, syntax: break}
+- {uid: "c:lang.kw.case",        name: case,        kind: keyword, since: C89, syntax: case}
+- {uid: "c:lang.kw.char",        name: char,        kind: keyword, since: C89, syntax: char}
+- {uid: "c:lang.kw.const",       name: const,       kind: keyword, since: C89, syntax: const}
+- {uid: "c:lang.kw.continue",    name: continue,    kind: keyword, since: C89, syntax: continue}
+- {uid: "c:lang.kw.default",     name: default,     kind: keyword, since: C89, syntax: default}
+- {uid: "c:lang.kw.do",          name: do,          kind: keyword, since: C89, syntax: do}
+- {uid: "c:lang.kw.double",      name: double,      kind: keyword, since: C89, syntax: double}
+- {uid: "c:lang.kw.else",        name: else,        kind: keyword, since: C89, syntax: else}
+- {uid: "c:lang.kw.enum",        name: enum,        kind: keyword, since: C89, syntax: enum}
+- {uid: "c:lang.kw.extern",      name: extern,      kind: keyword, since: C89, syntax: extern}
+- {uid: "c:lang.kw.float",       name: float,       kind: keyword, since: C89, syntax: float}
+- {uid: "c:lang.kw.for",         name: for,         kind: keyword, since: C89, syntax: for}
+- {uid: "c:lang.kw.goto",        name: goto,        kind: keyword, since: C89, syntax: goto}
+- {uid: "c:lang.kw.if",          name: if,          kind: keyword, since: C89, syntax: if}
+- {uid: "c:lang.kw.int",         name: int,         kind: keyword, since: C89, syntax: int}
+- {uid: "c:lang.kw.long",        name: long,        kind: keyword, since: C89, syntax: long}
+- {uid: "c:lang.kw.register",    name: register,    kind: keyword, since: C89, syntax: register}
+- {uid: "c:lang.kw.return",      name: return,      kind: keyword, since: C89, syntax: return}
+- {uid: "c:lang.kw.short",       name: short,       kind: keyword, since: C89, syntax: short}
+- {uid: "c:lang.kw.signed",      name: signed,      kind: keyword, since: C89, syntax: signed}
+- {uid: "c:lang.kw.sizeof",      name: sizeof,      kind: keyword, since: C89, syntax: sizeof}
+- {uid: "c:lang.kw.static",      name: static,      kind: keyword, since: C89, syntax: static}
+- {uid: "c:lang.kw.struct",      name: struct,      kind: keyword, since: C89, syntax: struct}
+- {uid: "c:lang.kw.switch",      name: switch,      kind: keyword, since: C89, syntax: switch}
+- {uid: "c:lang.kw.typedef",     name: typedef,     kind: keyword, since: C89, syntax: typedef}
+- {uid: "c:lang.kw.union",       name: union,       kind: keyword, since: C89, syntax: union}
+- {uid: "c:lang.kw.unsigned",    name: unsigned,    kind: keyword, since: C89, syntax: unsigned}
+- {uid: "c:lang.kw.void",        name: void,        kind: keyword, since: C89, syntax: void}
+- {uid: "c:lang.kw.volatile",    name: volatile,    kind: keyword, since: C89, syntax: volatile}
+- {uid: "c:lang.kw.while",       name: while,       kind: keyword, since: C89, syntax: while}
+# --- C99 ---------------------------------------------------------------------
+- {uid: "c:lang.kw.inline",      name: inline,      kind: keyword, since: C99, syntax: inline}
+- {uid: "c:lang.kw.restrict",    name: restrict,    kind: keyword, since: C99, syntax: restrict}
+- {uid: "c:lang.kw._Bool",       name: _Bool,       kind: keyword, since: C99, syntax: _Bool}
+- {uid: "c:lang.kw._Complex",    name: _Complex,    kind: keyword, since: C99, syntax: _Complex}
+- {uid: "c:lang.kw._Imaginary",  name: _Imaginary,  kind: keyword, since: C99, syntax: _Imaginary}
+- {uid: "c:lang.ct.vla",         name: variable_length_array, kind: statement, since: C99, syntax: "T name[n]"}
+- {uid: "c:lang.ct.designated",  name: designated_initializer, kind: statement, since: C99, syntax: ".field = value"}
+- {uid: "c:lang.ct.compound_lit", name: compound_literal, kind: statement, since: C99, syntax: "(T){...}"}
+# --- C11 ---------------------------------------------------------------------
+- {uid: "c:lang.kw._Alignas",       name: _Alignas,       kind: keyword, since: C11, syntax: _Alignas}
+- {uid: "c:lang.kw._Alignof",       name: _Alignof,       kind: keyword, since: C11, syntax: _Alignof}
+- {uid: "c:lang.kw._Atomic",        name: _Atomic,        kind: keyword, since: C11, syntax: _Atomic}
+- {uid: "c:lang.kw._Generic",       name: _Generic,       kind: keyword, since: C11, syntax: _Generic}
+- {uid: "c:lang.kw._Noreturn",      name: _Noreturn,      kind: keyword, since: C11, syntax: _Noreturn}
+- {uid: "c:lang.kw._Static_assert", name: _Static_assert, kind: keyword, since: C11, syntax: _Static_assert}
+- {uid: "c:lang.kw._Thread_local",  name: _Thread_local,  kind: keyword, since: C11, syntax: _Thread_local}
+# --- C23 ---------------------------------------------------------------------
+- {uid: "c:lang.kw.typeof",       name: typeof,       kind: keyword, since: C23, syntax: typeof}
+- {uid: "c:lang.kw.constexpr",    name: constexpr,    kind: keyword, since: C23, syntax: constexpr}
+- {uid: "c:lang.kw.nullptr",      name: nullptr,      kind: keyword, since: C23, syntax: nullptr}
+- {uid: "c:lang.kw.true",         name: "true",       kind: keyword, since: C23, syntax: "true"}
+- {uid: "c:lang.kw.false",        name: "false",      kind: keyword, since: C23, syntax: "false"}
+- {uid: "c:lang.kw.bool",         name: bool,         kind: keyword, since: C23, syntax: bool}
+- {uid: "c:lang.kw.static_assert", name: static_assert, kind: keyword, since: C23, syntax: static_assert}
+- {uid: "c:lang.kw.thread_local", name: thread_local, kind: keyword, since: C23, syntax: thread_local}
+- {uid: "c:lang.kw._BitInt",      name: _BitInt,      kind: keyword, since: C23, syntax: _BitInt}

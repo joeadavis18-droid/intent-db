@@ -1,0 +1,51 @@
+# Language CONSTRUCTS -- the things you write rather than call.
+#
+# A library call gets its slots from its parameters. A construct has no
+# parameters, so its slots are declared here: what the user must supply to
+# write a variable declaration, a loop, a function. Structure only -- the
+# WORDS come from the language pack, exactly as they do for functions.
+- name: declare_variable
+  kind: statement
+  header: null
+  emit: "${type} ${name}{${init}};"
+  since: C++11
+  slots:
+    - {slot: name, port_kind: value, input_kind: identifier, required: 1,
+       seed: "x",
+       constraint: "must be a valid identifier: letters, digits, underscore; not starting with a digit; not a keyword"}
+    - {slot: type, port_kind: value, input_kind: type, required: 1,
+       seed: "int",
+       constraint: "must be a complete type at this point in the file"}
+    - {slot: init, port_kind: value, input_kind: expression, required: 0,
+       seed: "0",
+       constraint: "braces reject narrowing: int x{3.5} will not compile"}
+
+- name: declare_constant
+  kind: statement
+  emit: "constexpr ${type} ${name} = ${init};"
+  since: C++11
+  slots:
+    - {slot: name, port_kind: value, input_kind: identifier, required: 1, seed: "kLimit"}
+    - {slot: type, port_kind: value, input_kind: type, required: 1, seed: "int"}
+    - {slot: init, port_kind: value, input_kind: expression, required: 1, seed: "0",
+       constraint: "must itself be a constant expression, evaluable at compile time"}
+
+- name: loop_over_range
+  kind: statement
+  emit: "for (${binding} : ${sequence}) {\n    ${body}\n}"
+  since: C++11
+  slots:
+    - {slot: binding, port_kind: value, input_kind: identifier, required: 1,
+       seed: "const auto& item",
+       constraint: "take by const& to avoid copying; by & only if you intend to modify"}
+    - {slot: sequence, port_kind: sequence, input_kind: expression, required: 1, seed: "v"}
+    - {slot: body, port_kind: callable, input_kind: expression, required: 1, seed: ""}
+
+- name: define_function
+  kind: statement
+  emit: "${ret} ${name}(${params}) {\n    ${body}\n}"
+  slots:
+    - {slot: name, port_kind: value, input_kind: identifier, required: 1, seed: "f"}
+    - {slot: ret, port_kind: value, input_kind: type, required: 1, seed: "void"}
+    - {slot: params, port_kind: pack, input_kind: expression, required: 0, seed: ""}
+    - {slot: body, port_kind: callable, input_kind: expression, required: 1, seed: ""}

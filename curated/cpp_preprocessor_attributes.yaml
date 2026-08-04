@@ -1,0 +1,277 @@
+# Preprocessor directives and standard attributes.
+
+- uid: cpp:lang.pp.include
+  kind: preprocessor
+  name: include
+  domain: language
+  std_since: C++98
+  summary: Textually insert another file at this point.
+  intent: >-
+    Pull in declarations. Angle brackets search the system paths, quotes search
+    the current directory first.
+  tags: [preprocessor, build, headers]
+  keys:
+    canonical: language.preprocessor.include-file
+    colloquial: [pull-in-a-header, use-a-library-header, import-declarations]
+    question: [how-do-i.include-a-header]
+    symbolic: ["#include"]
+
+- uid: cpp:lang.pp.define
+  kind: preprocessor
+  name: define
+  domain: language
+  std_since: C++98
+  summary: Define an object-like or function-like macro.
+  intent: >-
+    Text substitution before compilation. Prefer constexpr, inline functions,
+    and templates -- macros ignore scope and types. Still necessary for include
+    guards and conditional compilation.
+  tags: [preprocessor, macros]
+  keys:
+    canonical: language.preprocessor.define-macro
+    colloquial: [make-a-macro, define-a-compile-time-symbol]
+    question: [how-do-i.define-a-macro]
+    problem: [my-macro-expanded-in-a-place-i-did-not-expect]
+    symbolic: ["#define"]
+
+- uid: cpp:lang.pp.undef
+  kind: preprocessor
+  name: undef
+  domain: language
+  std_since: C++98
+  summary: Remove a macro definition.
+  intent: Undo a #define, usually to escape a header that defined an intrusive name.
+  tags: [preprocessor, macros]
+  keys:
+    canonical: language.preprocessor.undefine-macro
+    colloquial: [remove-a-macro, undo-a-define, get-rid-of-windows-min-max-macros]
+    problem: [a-header-defined-a-macro-that-breaks-my-code]
+    symbolic: ["#undef"]
+
+- uid: cpp:lang.pp.if
+  kind: preprocessor
+  name: 'if'
+  domain: language
+  std_since: C++98
+  summary: Conditionally compile a region based on a constant expression.
+  intent: >-
+    Include or exclude code before the compiler sees it -- platform variants,
+    debug-only blocks, feature gates. Family: #if #ifdef #ifndef #elif #elifdef
+    #elifndef #else #endif.
+  tags: [preprocessor, portability, conditional-compilation]
+  keys:
+    canonical: language.preprocessor.conditional-compilation
+    colloquial: [compile-this-only-on-some-platforms, debug-only-code,
+                 gate-code-behind-a-flag, platform-specific-code]
+    question: [how-do-i.compile-different-code-per-platform]
+    symbolic: ["#if", "#ifdef", "#ifndef", "#elif", "#elifdef", "#elifndef",
+               "#else", "#endif"]
+
+- uid: cpp:lang.pp.pragma_once
+  kind: preprocessor
+  name: pragma
+  domain: language
+  std_since: C++98
+  summary: Issue an implementation-defined directive; #pragma once guards a header.
+  intent: >-
+    Compiler-specific instructions. "#pragma once" is the near-universal
+    non-standard alternative to include guards; "#pragma pack" controls struct
+    layout.
+  tags: [preprocessor, headers, portability]
+  keys:
+    canonical: language.preprocessor.pragma
+    colloquial: [stop-a-header-being-included-twice, header-include-guard,
+                 control-struct-packing]
+    question: [how-do-i.prevent-double-inclusion-of-a-header]
+    problem: [redefinition-error-from-including-a-header-twice]
+    symbolic: ["#pragma", "#pragma once"]
+
+- uid: cpp:lang.pp.error
+  kind: preprocessor
+  name: error
+  domain: language
+  std_since: C++98
+  summary: Stop the build with a message; #warning emits one without stopping.
+  intent: Refuse to compile in an unsupported configuration, and say why.
+  tags: [preprocessor, diagnostics]
+  keys:
+    canonical: language.preprocessor.fail-build
+    colloquial: [stop-the-build-with-a-message, refuse-an-unsupported-configuration]
+    symbolic: ["#error", "#warning"]
+
+- uid: cpp:lang.pp.line
+  kind: preprocessor
+  name: line
+  domain: language
+  std_since: C++98
+  summary: Override the line number and file name reported by __LINE__ and __FILE__.
+  intent: Used by code generators so diagnostics point at the original source.
+  tags: [preprocessor, codegen, tooling]
+  keys:
+    canonical: language.preprocessor.set-line-info
+    colloquial: [make-errors-point-at-my-generated-source]
+    symbolic: ["#line"]
+
+- uid: cpp:lang.pp.has_include
+  kind: preprocessor
+  name: has_include
+  domain: language
+  std_since: C++17
+  summary: Test whether a header is available before including it.
+  intent: >-
+    Write code that adapts to whichever library version is installed, instead
+    of failing to compile when a header is missing.
+  tags: [preprocessor, portability, feature-detection]
+  keys:
+    canonical: language.preprocessor.detect-header
+    colloquial: [check-if-a-header-exists, adapt-to-whichever-library-is-installed]
+    question: [how-do-i.test-whether-a-header-is-available]
+    symbolic: ["__has_include", "__has_cpp_attribute"]
+
+- uid: cpp:lang.pp.stringize
+  kind: preprocessor
+  name: stringize
+  domain: language
+  std_since: C++98
+  summary: '# turns a macro argument into a string literal; ## pastes two tokens together.'
+  intent: >-
+    The two macro operators. Stringizing is how assertion macros print the
+    expression that failed; token pasting builds identifiers programmatically.
+  tags: [preprocessor, macros, metaprogramming]
+  keys:
+    canonical: language.preprocessor.stringize-and-paste
+    colloquial: [turn-a-macro-argument-into-a-string, glue-two-tokens-together,
+                 build-an-identifier-in-a-macro]
+    question: [how-do-i.print-the-expression-that-failed]
+    symbolic: ['#', '##']
+
+# --- standard attributes -----------------------------------------------------
+
+- uid: cpp:lang.attr.nodiscard
+  kind: attribute
+  name: nodiscard
+  domain: language
+  std_since: C++17
+  summary: Warn when a return value is ignored.
+  intent: >-
+    For functions whose result IS the point -- error codes, factory results,
+    and pure queries like empty(), which is famously mistaken for clear().
+  tags: [attributes, diagnostics, correctness]
+  keys:
+    canonical: language.attribute.warn-on-ignored-result
+    colloquial: [warn-if-someone-ignores-the-return-value,
+                 make-ignoring-an-error-code-a-warning]
+    question: [how-do-i.stop-callers-ignoring-my-return-value]
+    problem: [someone-called-empty-when-they-meant-clear]
+    symbolic: ["[[nodiscard]]"]
+
+- uid: cpp:lang.attr.maybe_unused
+  kind: attribute
+  name: maybe_unused
+  domain: language
+  std_since: C++17
+  summary: Suppress the warning for an entity that may legitimately go unused.
+  intent: >-
+    For parameters used only in some build configurations -- typically a
+    variable that only an assert reads.
+  tags: [attributes, diagnostics]
+  keys:
+    canonical: language.attribute.allow-unused
+    colloquial: [silence-the-unused-variable-warning,
+                 this-parameter-is-only-used-in-debug-builds]
+    problem: [unused-parameter-warning-in-release-builds]
+    symbolic: ["[[maybe_unused]]"]
+
+- uid: cpp:lang.attr.deprecated
+  kind: attribute
+  name: deprecated
+  domain: language
+  std_since: C++14
+  summary: Mark an entity as obsolete, warning at each use.
+  intent: Retire an API gradually, pointing users at the replacement in the message.
+  tags: [attributes, api-evolution]
+  keys:
+    canonical: language.attribute.mark-deprecated
+    colloquial: [mark-an-api-as-obsolete, warn-users-off-an-old-function,
+                 retire-a-function-gradually]
+    question: [how-do-i.deprecate-a-function]
+    symbolic: ["[[deprecated]]"]
+
+- uid: cpp:lang.attr.fallthrough
+  kind: attribute
+  name: fallthrough
+  domain: language
+  std_since: C++17
+  summary: Declare that falling through to the next switch case is intentional.
+  intent: Keep the compiler's fallthrough warning on while allowing deliberate ones.
+  tags: [attributes, control-flow, diagnostics]
+  keys:
+    canonical: language.attribute.intentional-fallthrough
+    colloquial: [this-switch-fallthrough-is-on-purpose,
+                 silence-the-fallthrough-warning]
+    symbolic: ["[[fallthrough]]"]
+
+- uid: cpp:lang.attr.noreturn
+  kind: attribute
+  name: noreturn
+  domain: language
+  std_since: C++11
+  summary: Declare that a function never returns to its caller.
+  intent: >-
+    For functions that always throw, exit, or abort. Lets the compiler prune
+    the code after the call and silences bogus "missing return" warnings.
+  tags: [attributes, control-flow, diagnostics]
+  keys:
+    canonical: language.attribute.never-returns
+    colloquial: [this-function-always-throws-or-exits,
+                 silence-the-missing-return-warning]
+    symbolic: ["[[noreturn]]"]
+
+- uid: cpp:lang.attr.likely
+  kind: attribute
+  name: likely
+  domain: language
+  std_since: C++20
+  summary: Hint which branch is the common one, for layout and prediction.
+  intent: >-
+    Help the optimiser lay out the hot path contiguously. Only worth using
+    where profiling shows it matters.
+  tags: [attributes, performance, optimisation]
+  keys:
+    canonical: language.attribute.branch-hint
+    colloquial: [tell-the-compiler-which-branch-is-common,
+                 optimise-for-the-hot-path]
+    symbolic: ["[[likely]]", "[[unlikely]]"]
+
+- uid: cpp:lang.attr.no_unique_address
+  kind: attribute
+  name: no_unique_address
+  domain: language
+  std_since: C++20
+  summary: Allow an empty member to occupy no additional storage.
+  intent: >-
+    The modern replacement for the empty base optimisation trick -- stateless
+    allocators, comparators, and deleters stop costing a byte plus padding.
+  tags: [attributes, memory, layout, performance]
+  keys:
+    canonical: language.attribute.empty-member-optimisation
+    colloquial: [stop-an-empty-member-taking-space,
+                 empty-base-optimisation-without-inheritance]
+    problem: [my-stateless-comparator-is-adding-8-bytes-to-every-object]
+    symbolic: ["[[no_unique_address]]"]
+
+- uid: cpp:lang.attr.assume
+  kind: attribute
+  name: assume
+  domain: language
+  std_since: C++23
+  summary: Promise the compiler that an expression is true, without checking it.
+  intent: >-
+    Feed the optimiser a fact it cannot prove. If the assumption is ever false
+    the behaviour is undefined, so this is a sharp tool.
+  tags: [attributes, performance, danger]
+  keys:
+    canonical: language.attribute.optimiser-assumption
+    colloquial: [promise-the-compiler-something-is-true,
+                 give-the-optimiser-a-fact-it-cannot-prove]
+    symbolic: ["[[assume]]"]

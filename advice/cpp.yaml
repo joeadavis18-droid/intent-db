@@ -1,0 +1,42 @@
+# "This works. Here is a safer way to do the same thing."
+#
+# Structural half: which declaration supersedes which, and how strongly. Keyed
+# by qualified name because the declaration is the join key every pack shares --
+# concept partitions are pack-local, so an edge stated in concepts would not
+# survive into another language pack.
+#
+# severity:  prefer   = works correctly; there is a better idiom
+#            unsafe   = a correctness or security hazard is easy to hit
+#            obsolete = superseded or removed by the standard
+- {from: malloc,        to: "std::make_unique",  severity: prefer,  key: manual_memory}
+- {from: calloc,        to: "std::vector",       severity: prefer,  key: manual_memory}
+- {from: realloc,       to: "std::vector",       severity: prefer,  key: manual_memory}
+- {from: free,          to: "std::unique_ptr",   severity: prefer,  key: manual_memory}
+- {from: strcpy,        to: "std::string",       severity: unsafe,  key: unbounded_copy}
+- {from: strcat,        to: "std::string",       severity: unsafe,  key: unbounded_copy}
+- {from: sprintf,       to: "std::format",       severity: unsafe,  key: unbounded_format}
+- {from: strtok,        to: "std::ranges::split_view", severity: unsafe, key: shared_state}
+- {from: atoi,          to: "std::from_chars",   severity: unsafe,  key: silent_parse_failure}
+- {from: atof,          to: "std::from_chars",   severity: unsafe,  key: silent_parse_failure}
+- {from: rand,          to: "std::uniform_int_distribution", severity: prefer, key: weak_random}
+- {from: srand,         to: "std::mt19937",      severity: prefer,  key: weak_random}
+- {from: qsort,         to: "std::sort",         severity: prefer,  key: untyped_callback}
+- {from: bsearch,       to: "std::binary_search", severity: prefer, key: untyped_callback}
+- {from: memcpy,        to: "std::copy",         severity: prefer,  key: raw_bytes}
+- {from: printf,        to: "std::format",       severity: prefer,  key: unchecked_format}
+- {from: "std::bind",   to: "std::invoke",       severity: prefer,  key: prefer_lambda}
+
+# --- modern C++ biting modern C++ -------------------------------------------
+# These matter more than the C-legacy set above: they catch people who believe
+# they are already writing safe code. Each is a real, documented hazard.
+- {from: "std::map::operator[]",            to: "std::map::at",       severity: unsafe,  key: subscript_inserts}
+- {from: "std::unordered_map::operator[]",  to: "std::unordered_map::at", severity: unsafe, key: subscript_inserts}
+- {from: "std::vector::operator[]",         to: "std::vector::at",    severity: prefer,  key: unchecked_index}
+- {from: "std::array::operator[]",          to: "std::array::at",     severity: prefer,  key: unchecked_index}
+- {from: "std::vector::front",              to: "std::vector::empty", severity: unsafe,  key: empty_access}
+- {from: "std::vector::back",               to: "std::vector::empty", severity: unsafe,  key: empty_access}
+- {from: "std::optional::value",            to: "std::optional::value_or", severity: prefer, key: optional_throws}
+- {from: "std::make_shared",                to: "std::make_unique",   severity: prefer,  key: default_unique}
+- {from: "std::shared_ptr",                 to: "std::unique_ptr",    severity: prefer,  key: default_unique}
+- {from: "std::endl",                       to: "std::flush",         severity: prefer,  key: endl_flushes}
+- {from: "std::move",                       to: "std::forward",       severity: prefer,  key: move_in_template}

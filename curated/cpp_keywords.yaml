@@ -1,0 +1,1375 @@
+# C++ keywords -- the part of the lexicon no header scan can produce.
+# Hand-written: summary, intent (embedded), and semantic keys.
+# `keys.canonical` must be globally unique; lint.py enforces it.
+
+- uid: cpp:lang.kw.alignas
+  kind: keyword
+  name: alignas
+  domain: language
+  std_since: C++11
+  summary: Force a type or object to a stricter memory alignment.
+  intent: >-
+    Control where in memory something is placed. Used for cache-line padding to
+    avoid false sharing between threads, for SIMD types that require 16 or 32
+    byte alignment, and for hardware structures with fixed layout requirements.
+  tags: [memory, layout, performance, low-level]
+  keys:
+    canonical: language.memory.align-to
+    colloquial: [force-memory-alignment, pad-to-a-cache-line, align-for-simd]
+    question: [how-do-i.control-memory-alignment]
+    problem: [false-sharing-between-threads, unaligned-simd-load-crashes]
+    symbolic: [alignas]
+
+- uid: cpp:lang.kw.alignof
+  kind: keyword
+  name: alignof
+  domain: language
+  std_since: C++11
+  summary: Query the required alignment of a type, in bytes.
+  intent: Find out what byte boundary a type must sit on. Companion to sizeof.
+  tags: [memory, layout, introspection]
+  keys:
+    canonical: language.memory.alignment-of
+    colloquial: [what-alignment-does-this-type-need, get-type-alignment]
+    question: [how-do-i.find-a-types-alignment]
+    symbolic: [alignof]
+
+- uid: cpp:lang.kw.asm
+  kind: keyword
+  name: asm
+  domain: language
+  std_since: C++98
+  summary: Embed assembly instructions directly in a function.
+  intent: >-
+    Drop to raw machine instructions when no C++ construct expresses what the
+    hardware must do -- special registers, atomic primitives, timing barriers.
+    Non-portable by nature.
+  tags: [low-level, non-portable, hardware]
+  keys:
+    canonical: language.hardware.inline-assembly
+    colloquial: [write-raw-assembly, drop-to-machine-code]
+    question: [how-do-i.embed-assembly-in-c-plus-plus]
+    symbolic: [asm, __asm__]
+
+- uid: cpp:lang.kw.auto
+  kind: keyword
+  name: auto
+  domain: language
+  std_since: C++11
+  summary: Let the compiler deduce a variable's type from its initialiser.
+  intent: >-
+    Stop writing out long iterator and lambda type names. Also used for return
+    type deduction on functions and, since C++20, as an abbreviated function
+    template parameter.
+  tags: [types, deduction, readability]
+  keys:
+    canonical: language.type.deduce
+    colloquial: [let-the-compiler-figure-out-the-type, dont-write-the-type-out,
+                 infer-the-variable-type]
+    question: [how-do-i.avoid-writing-long-type-names]
+    problem: [this-iterator-type-name-is-unreadable]
+    symbolic: [auto]
+
+- uid: cpp:lang.kw.bool
+  kind: keyword
+  name: bool
+  domain: language
+  std_since: C++98
+  summary: The built-in boolean type, holding true or false.
+  intent: Represent a yes/no condition.
+  tags: [types, fundamental]
+  keys:
+    canonical: language.type.boolean
+    colloquial: [true-or-false-value, yes-no-flag]
+    symbolic: [bool]
+
+- uid: cpp:lang.kw.break
+  kind: keyword
+  name: break
+  domain: language
+  std_since: C++98
+  summary: Leave the innermost enclosing loop or switch immediately.
+  intent: Stop looping early once the answer is found, or end a switch case.
+  tags: [control-flow, loops]
+  keys:
+    canonical: language.control.exit-loop
+    colloquial: [stop-the-loop-early, get-out-of-this-loop, end-a-switch-case]
+    question: [how-do-i.exit-a-loop-early]
+    problem: [my-loop-keeps-running-after-i-found-what-i-wanted]
+    symbolic: [break]
+
+- uid: cpp:lang.kw.case
+  kind: keyword
+  name: case
+  domain: language
+  std_since: C++98
+  summary: Label one branch of a switch statement.
+  intent: Name the constant value that selects this branch of a switch.
+  tags: [control-flow, branching]
+  keys:
+    canonical: language.control.switch-branch
+    colloquial: [one-branch-of-a-switch, handle-this-specific-value]
+    symbolic: [case]
+
+- uid: cpp:lang.kw.catch
+  kind: keyword
+  name: catch
+  domain: language
+  std_since: C++98
+  summary: Handle an exception thrown inside the preceding try block.
+  intent: >-
+    Recover from a failure signalled by throw. Catch by const reference to avoid
+    slicing; catch(...) catches everything.
+  tags: [error-handling, exceptions]
+  keys:
+    canonical: language.error.handle-exception
+    colloquial: [handle-an-error, deal-with-a-thrown-exception, recover-from-a-failure]
+    question: [how-do-i.catch-an-exception]
+    problem: [my-program-crashes-on-an-uncaught-exception]
+    symbolic: [catch]
+
+- uid: cpp:lang.kw.char
+  kind: keyword
+  name: char
+  domain: language
+  std_since: C++98
+  summary: The narrow character type, one byte wide.
+  intent: Hold a single byte or character. Signedness is implementation defined.
+  tags: [types, fundamental, text]
+  keys:
+    canonical: language.type.character
+    colloquial: [a-single-character, one-byte-value]
+    symbolic: [char]
+
+- uid: cpp:lang.kw.char8_t
+  kind: keyword
+  name: char8_t
+  domain: language
+  std_since: C++20
+  summary: A distinct type for one UTF-8 code unit.
+  intent: Type-safe UTF-8 text, distinguishable from plain bytes.
+  tags: [types, text, unicode]
+  keys:
+    canonical: language.type.utf8-code-unit
+    colloquial: [utf8-character-type, unicode-byte]
+    symbolic: [char8_t]
+
+- uid: cpp:lang.kw.char16_t
+  kind: keyword
+  name: char16_t
+  domain: language
+  std_since: C++11
+  summary: A distinct type for one UTF-16 code unit.
+  intent: Type-safe UTF-16 text.
+  tags: [types, text, unicode]
+  keys:
+    canonical: language.type.utf16-code-unit
+    colloquial: [utf16-character-type]
+    symbolic: [char16_t]
+
+- uid: cpp:lang.kw.char32_t
+  kind: keyword
+  name: char32_t
+  domain: language
+  std_since: C++11
+  summary: A distinct type for one UTF-32 code unit, i.e. one code point.
+  intent: Type-safe UTF-32 text, where one unit is one Unicode code point.
+  tags: [types, text, unicode]
+  keys:
+    canonical: language.type.utf32-code-unit
+    colloquial: [utf32-character-type, one-unicode-code-point]
+    symbolic: [char32_t]
+
+- uid: cpp:lang.kw.class
+  kind: keyword
+  name: class
+  domain: language
+  std_since: C++98
+  summary: Define a class type whose members default to private.
+  intent: >-
+    Bundle data with the operations that maintain its invariants. Identical to
+    struct except for the default access level and default inheritance.
+  tags: [types, oop, encapsulation]
+  keys:
+    canonical: language.type.define-class
+    colloquial: [make-a-new-type, define-an-object-type, bundle-data-and-behaviour]
+    question: [how-do-i.define-a-class]
+    symbolic: [class]
+
+- uid: cpp:lang.kw.concept
+  kind: keyword
+  name: concept
+  domain: language
+  std_since: C++20
+  summary: Name a compile-time predicate constraining template arguments.
+  intent: >-
+    Say what a template requires of its type argument, so misuse produces a
+    short readable error instead of pages of instantiation noise, and so
+    overloads can be selected on capability.
+  tags: [templates, constraints, generics]
+  keys:
+    canonical: language.template.define-concept
+    colloquial: [constrain-a-template, say-what-a-type-must-support,
+                 make-template-errors-readable]
+    question: [how-do-i.constrain-a-template-parameter]
+    problem: [my-template-error-messages-are-unreadable]
+    symbolic: [concept]
+
+- uid: cpp:lang.kw.const
+  kind: keyword
+  name: const
+  domain: language
+  std_since: C++98
+  summary: Mark an object or member function as not modifying its target.
+  intent: >-
+    Promise not to change something, so the compiler enforces it and readers can
+    rely on it. On a member function it means "does not modify *this".
+  tags: [types, immutability, correctness]
+  keys:
+    canonical: language.type.immutable
+    colloquial: [make-it-read-only, promise-not-to-modify-this, mark-a-method-const]
+    question: [how-do-i.make-something-read-only]
+    symbolic: [const]
+
+- uid: cpp:lang.kw.consteval
+  kind: keyword
+  name: consteval
+  domain: language
+  std_since: C++20
+  summary: Declare a function that may ONLY be called at compile time.
+  intent: >-
+    Stronger than constexpr: an immediate function. Every call must be a
+    constant expression, so there is never a runtime version of it.
+  tags: [compile-time, performance]
+  keys:
+    canonical: language.compile-time.immediate-function
+    colloquial: [must-run-at-compile-time, never-allow-a-runtime-call]
+    question: [how-do-i.force-compile-time-evaluation]
+    symbolic: [consteval]
+
+- uid: cpp:lang.kw.constexpr
+  kind: keyword
+  name: constexpr
+  domain: language
+  std_since: C++11
+  summary: Allow a value or function to be evaluated at compile time.
+  intent: >-
+    Move work from run time to build time. A constexpr variable is a true
+    compile-time constant usable as an array bound or template argument; a
+    constexpr function may still be called at run time when its arguments are
+    not constant.
+  tags: [compile-time, performance]
+  keys:
+    canonical: language.compile-time.constant-expression
+    colloquial: [compute-this-at-compile-time, bake-the-value-in,
+                 make-it-a-compile-time-constant]
+    question: [how-do-i.compute-something-at-compile-time]
+    problem: [this-constant-is-recomputed-every-run]
+    symbolic: [constexpr]
+
+- uid: cpp:lang.kw.constinit
+  kind: keyword
+  name: constinit
+  domain: language
+  std_since: C++20
+  summary: Require a static variable to be initialised at compile time.
+  intent: >-
+    Guarantee no dynamic initialisation, eliminating the static initialisation
+    order fiasco, while still allowing later mutation (unlike constexpr).
+  tags: [compile-time, initialisation, globals]
+  keys:
+    canonical: language.compile-time.static-initialisation
+    colloquial: [no-dynamic-initialisation, avoid-static-init-order-fiasco]
+    problem: [static-initialisation-order-fiasco]
+    symbolic: [constinit]
+
+- uid: cpp:lang.kw.const_cast
+  kind: keyword
+  name: const_cast
+  domain: language
+  std_since: C++98
+  summary: Add or remove const/volatile from a pointer or reference.
+  intent: >-
+    Strip constness, almost always to call a legacy C API that takes a
+    non-const pointer it does not actually modify. Writing through a
+    const_cast to an originally-const object is undefined behaviour.
+  tags: [casts, legacy-interop, danger]
+  keys:
+    canonical: language.cast.remove-const
+    colloquial: [cast-away-const, strip-constness-for-a-c-api]
+    question: [how-do-i.remove-const-from-a-pointer]
+    problem: [this-c-api-wants-a-non-const-pointer]
+    symbolic: [const_cast]
+
+- uid: cpp:lang.kw.continue
+  kind: keyword
+  name: continue
+  domain: language
+  std_since: C++98
+  summary: Skip the rest of this loop iteration and start the next one.
+  intent: Skip elements that fail a filter without nesting the body in an if.
+  tags: [control-flow, loops]
+  keys:
+    canonical: language.control.next-iteration
+    colloquial: [skip-this-item-and-carry-on, jump-to-the-next-iteration]
+    question: [how-do-i.skip-one-loop-iteration]
+    symbolic: [continue]
+
+- uid: cpp:lang.kw.co_await
+  kind: keyword
+  name: co_await
+  domain: language
+  std_since: C++20
+  summary: Suspend a coroutine until an awaited operation completes.
+  intent: >-
+    Write asynchronous code in straight-line form. The function pauses, the
+    thread is released to do other work, and execution resumes where it left
+    off when the awaited thing is ready.
+  tags: [async, coroutines, concurrency]
+  keys:
+    canonical: language.async.await
+    colloquial: [wait-without-blocking-a-thread, pause-until-the-async-work-is-done,
+                 write-async-code-that-reads-like-sync-code]
+    question: [how-do-i.await-an-async-operation]
+    problem: [my-callback-code-is-deeply-nested]
+    symbolic: [co_await]
+
+- uid: cpp:lang.kw.co_return
+  kind: keyword
+  name: co_return
+  domain: language
+  std_since: C++20
+  summary: Finish a coroutine, optionally yielding a final value.
+  intent: End a coroutine and deliver its result to whoever awaits it.
+  tags: [async, coroutines]
+  keys:
+    canonical: language.async.coroutine-return
+    colloquial: [finish-a-coroutine, return-from-async-code]
+    symbolic: [co_return]
+
+- uid: cpp:lang.kw.co_yield
+  kind: keyword
+  name: co_yield
+  domain: language
+  std_since: C++20
+  summary: Produce one value from a coroutine and suspend until the next is wanted.
+  intent: >-
+    Write a lazy generator: emit items one at a time without materialising the
+    whole sequence in memory.
+  tags: [async, coroutines, generators, lazy]
+  keys:
+    canonical: language.async.yield-value
+    colloquial: [produce-values-lazily, write-a-generator, emit-one-item-at-a-time]
+    question: [how-do-i.write-a-lazy-generator]
+    problem: [i-dont-want-to-build-the-whole-list-in-memory]
+    symbolic: [co_yield]
+
+- uid: cpp:lang.kw.decltype
+  kind: keyword
+  name: decltype
+  domain: language
+  std_since: C++11
+  summary: Yield the declared type of an expression, without evaluating it.
+  intent: >-
+    Name a type you cannot spell -- the result of an expression, a lambda's
+    type, or a dependent type in a template. decltype(auto) preserves
+    references and value category exactly.
+  tags: [types, deduction, templates]
+  keys:
+    canonical: language.type.of-expression
+    colloquial: [get-the-type-of-an-expression, name-an-unspellable-type]
+    question: [how-do-i.get-the-type-of-an-expression]
+    symbolic: [decltype, "decltype(auto)"]
+
+- uid: cpp:lang.kw.default
+  kind: keyword
+  name: default
+  domain: language
+  std_since: C++98
+  summary: Label the fallback branch of a switch, or ask for a compiler-generated member.
+  intent: >-
+    Two unrelated uses -- the catch-all switch label, and "= default" asking the
+    compiler to generate the obvious constructor, destructor, or assignment.
+  tags: [control-flow, special-members]
+  keys:
+    canonical: language.control.switch-fallback
+    colloquial: [the-other-cases-of-a-switch, ask-for-the-compiler-generated-version,
+                 default-the-copy-constructor]
+    question: [how-do-i.get-a-compiler-generated-constructor]
+    symbolic: [default, "= default"]
+
+- uid: cpp:lang.kw.delete
+  kind: keyword
+  name: delete
+  domain: language
+  std_since: C++98
+  summary: Destroy a new-allocated object, or forbid an overload entirely.
+  intent: >-
+    Free memory obtained with new (prefer smart pointers), or "= delete" to make
+    a function unusable so a bad call fails to compile.
+  tags: [memory, special-members]
+  keys:
+    canonical: language.memory.free-object
+    colloquial: [free-memory-from-new, forbid-a-function-overload,
+                 make-a-class-non-copyable]
+    question: [how-do-i.prevent-copying-of-my-class]
+    problem: [i-am-leaking-memory-from-new]
+    symbolic: [delete, "= delete", "delete[]"]
+
+- uid: cpp:lang.kw.do
+  kind: keyword
+  name: do
+  domain: language
+  std_since: C++98
+  summary: Run a loop body once before testing the condition.
+  intent: Loop where the body must execute at least one time.
+  tags: [control-flow, loops]
+  keys:
+    canonical: language.control.do-while-loop
+    colloquial: [loop-at-least-once, test-the-condition-after-the-body]
+    question: [how-do-i.run-a-loop-body-at-least-once]
+    symbolic: [do, do-while]
+
+- uid: cpp:lang.kw.double
+  kind: keyword
+  name: double
+  domain: language
+  std_since: C++98
+  summary: Double-precision binary floating-point type.
+  intent: The default choice for real numbers.
+  tags: [types, fundamental, math]
+  keys:
+    canonical: language.type.double-precision-float
+    colloquial: [a-decimal-number, floating-point-value]
+    symbolic: [double]
+
+- uid: cpp:lang.kw.dynamic_cast
+  kind: keyword
+  name: dynamic_cast
+  domain: language
+  std_since: C++98
+  summary: Safely downcast a polymorphic reference or pointer, checking at run time.
+  intent: >-
+    Ask "is this base pointer really pointing at that derived type?". Returns
+    nullptr for a failed pointer cast, throws std::bad_cast for a reference.
+    Requires at least one virtual function.
+  tags: [casts, polymorphism, rtti]
+  keys:
+    canonical: language.cast.checked-downcast
+    colloquial: [safely-downcast-a-pointer, check-what-derived-type-this-really-is,
+                 cast-a-base-pointer-to-a-derived-pointer]
+    question: [how-do-i.downcast-safely]
+    problem: [my-static-cast-downcast-is-crashing]
+    symbolic: [dynamic_cast]
+
+- uid: cpp:lang.kw.else
+  kind: keyword
+  name: else
+  domain: language
+  std_since: C++98
+  summary: Provide the alternative branch of an if statement.
+  intent: Do something different when the condition was false.
+  tags: [control-flow, branching]
+  keys:
+    canonical: language.control.otherwise
+    colloquial: [the-other-branch, what-to-do-when-the-test-fails]
+    symbolic: [else]
+
+- uid: cpp:lang.kw.enum
+  kind: keyword
+  name: enum
+  domain: language
+  std_since: C++98
+  summary: Define a type whose values are a fixed named set.
+  intent: >-
+    Replace magic numbers with named alternatives. Prefer "enum class" (C++11),
+    which is scoped and does not implicitly convert to int.
+  tags: [types, constants]
+  keys:
+    canonical: language.type.define-enumeration
+    colloquial: [name-a-fixed-set-of-values, replace-magic-numbers,
+                 define-a-scoped-enum]
+    question: [how-do-i.define-an-enum-class]
+    problem: [my-code-is-full-of-magic-numbers]
+    symbolic: [enum, enum class, enum struct]
+
+- uid: cpp:lang.kw.explicit
+  kind: keyword
+  name: explicit
+  domain: language
+  std_since: C++98
+  summary: Forbid a constructor or conversion operator from being used implicitly.
+  intent: >-
+    Stop surprising silent conversions. Since C++20, explicit(bool) makes it
+    conditional on a compile-time test.
+  tags: [conversions, correctness, constructors]
+  keys:
+    canonical: language.conversion.no-implicit
+    colloquial: [stop-silent-conversions, require-a-deliberate-cast,
+                 no-accidental-implicit-conversion]
+    question: [how-do-i.prevent-implicit-conversion]
+    problem: [my-constructor-is-being-called-accidentally]
+    symbolic: [explicit]
+
+- uid: cpp:lang.kw.export
+  kind: keyword
+  name: export
+  domain: language
+  std_since: C++20
+  summary: Make a declaration visible to importers of a module.
+  intent: Publish part of a module as its public interface.
+  tags: [modules, visibility]
+  keys:
+    canonical: language.module.export-declaration
+    colloquial: [make-something-public-from-a-module, publish-a-module-interface]
+    symbolic: [export]
+
+- uid: cpp:lang.kw.extern
+  kind: keyword
+  name: extern
+  domain: language
+  std_since: C++98
+  summary: Declare that a name is defined in another translation unit, or set linkage.
+  intent: >-
+    Refer to a global defined elsewhere, or with extern "C" give a function
+    C linkage so it can be called from C or loaded by name.
+  tags: [linkage, interop, globals]
+  keys:
+    canonical: language.linkage.declare-external
+    colloquial: [use-a-global-defined-elsewhere, give-a-function-c-linkage,
+                 stop-name-mangling]
+    question: [how-do-i.call-c-plus-plus-code-from-c]
+    problem: [undefined-reference-at-link-time]
+    symbolic: [extern, 'extern "C"']
+
+- uid: cpp:lang.kw.false
+  kind: keyword
+  name: 'false'
+  domain: language
+  std_since: C++98
+  summary: The boolean literal for "no".
+  intent: The false value of type bool.
+  tags: [literals, fundamental]
+  keys:
+    canonical: language.literal.false
+    colloquial: [the-false-value, boolean-no]
+    symbolic: ['false']
+
+- uid: cpp:lang.kw.float
+  kind: keyword
+  name: float
+  domain: language
+  std_since: C++98
+  summary: Single-precision binary floating-point type.
+  intent: Half the memory of double, roughly seven significant digits.
+  tags: [types, fundamental, math]
+  keys:
+    canonical: language.type.single-precision-float
+    colloquial: [a-small-decimal-number, 32-bit-float]
+    symbolic: [float]
+
+- uid: cpp:lang.kw.for
+  kind: keyword
+  name: for
+  domain: language
+  std_since: C++98
+  summary: Loop with an initialiser, a condition, and a step; or iterate a range.
+  intent: >-
+    The workhorse loop. The range-for form (C++11) walks any container or range
+    without index arithmetic and is the form to reach for by default.
+  tags: [control-flow, loops, iteration]
+  keys:
+    canonical: language.control.for-loop
+    colloquial: [loop-over-a-container, iterate-through-everything,
+                 walk-every-element, repeat-n-times]
+    question: [how-do-i.loop-over-a-vector, how-do-i.write-a-range-based-for-loop]
+    problem: [my-index-arithmetic-is-off-by-one]
+    symbolic: [for, range-for]
+
+- uid: cpp:lang.kw.friend
+  kind: keyword
+  name: friend
+  domain: language
+  std_since: C++98
+  summary: Grant another function or class access to private members.
+  intent: >-
+    Let a closely related non-member -- typically operator<< or a factory --
+    see internals without making them public to everyone.
+  tags: [access-control, oop]
+  keys:
+    canonical: language.access.grant-friendship
+    colloquial: [let-another-class-see-my-privates,
+                 give-a-free-function-access-to-private-members]
+    question: [how-do-i.write-an-output-operator-that-sees-private-data]
+    symbolic: [friend]
+
+- uid: cpp:lang.kw.goto
+  kind: keyword
+  name: goto
+  domain: language
+  std_since: C++98
+  summary: Jump unconditionally to a label in the same function.
+  intent: >-
+    Rarely justified in C++; RAII and break/continue cover almost every case.
+    Occasionally used to escape deeply nested loops.
+  tags: [control-flow, discouraged]
+  keys:
+    canonical: language.control.unconditional-jump
+    colloquial: [jump-to-a-label, break-out-of-nested-loops]
+    symbolic: [goto]
+
+- uid: cpp:lang.kw.if
+  kind: keyword
+  name: if
+  domain: language
+  std_since: C++98
+  summary: Execute a branch only when a condition holds.
+  intent: >-
+    Basic branching. "if constexpr" (C++17) discards the untaken branch at
+    compile time; "if consteval" (C++23) detects constant evaluation; both
+    support an init-statement since C++17.
+  tags: [control-flow, branching]
+  keys:
+    canonical: language.control.conditional
+    colloquial: [do-something-only-when, branch-on-a-condition,
+                 compile-time-branch]
+    question: [how-do-i.branch-at-compile-time]
+    symbolic: [if, if constexpr, if consteval]
+
+- uid: cpp:lang.kw.inline
+  kind: keyword
+  name: inline
+  domain: language
+  std_since: C++98
+  summary: Permit multiple identical definitions across translation units.
+  intent: >-
+    Primarily a linkage rule, not an optimisation hint: it is what lets a
+    function or (C++17) a variable be defined in a header without a duplicate
+    symbol error at link time.
+  tags: [linkage, headers]
+  keys:
+    canonical: language.linkage.inline-definition
+    colloquial: [define-a-function-in-a-header, avoid-duplicate-symbol-errors,
+                 header-only-variable]
+    question: [how-do-i.define-a-global-in-a-header]
+    problem: [multiple-definition-error-at-link-time]
+    symbolic: [inline]
+
+- uid: cpp:lang.kw.int
+  kind: keyword
+  name: int
+  domain: language
+  std_since: C++98
+  summary: The default signed integer type.
+  intent: Whole numbers; at least 16 bits, in practice 32.
+  tags: [types, fundamental]
+  keys:
+    canonical: language.type.integer
+    colloquial: [a-whole-number, plain-integer]
+    symbolic: [int]
+
+- uid: cpp:lang.kw.long
+  kind: keyword
+  name: long
+  domain: language
+  std_since: C++98
+  summary: A longer signed integer type; "long long" is at least 64 bits.
+  intent: Wider whole numbers. Prefer the fixed-width types in <cstdint> for portability.
+  tags: [types, fundamental]
+  keys:
+    canonical: language.type.long-integer
+    colloquial: [a-big-whole-number, 64-bit-integer]
+    symbolic: [long, long long]
+
+- uid: cpp:lang.kw.mutable
+  kind: keyword
+  name: mutable
+  domain: language
+  std_since: C++98
+  summary: Allow a member to change even through a const object, or make a lambda's captures writable.
+  intent: >-
+    Carve out state that is not part of the logical value -- a cache, a memo, a
+    mutex. On a lambda, it drops the const on by-value captures.
+  tags: [immutability, lambdas, caching]
+  keys:
+    canonical: language.type.mutable-member
+    colloquial: [let-a-const-method-modify-this-field, cache-inside-a-const-object,
+                 make-a-lambda-capture-writable]
+    question: [how-do-i.memoise-inside-a-const-member-function]
+    symbolic: [mutable]
+
+- uid: cpp:lang.kw.namespace
+  kind: keyword
+  name: namespace
+  domain: language
+  std_since: C++98
+  summary: Group declarations under a name to prevent collisions.
+  intent: >-
+    Keep your names out of everyone else's way. An unnamed namespace gives
+    internal linkage; "namespace x = long::name" makes an alias.
+  tags: [organisation, naming, linkage]
+  keys:
+    canonical: language.naming.define-namespace
+    colloquial: [avoid-name-collisions, group-my-code-under-a-name,
+                 make-a-namespace-alias]
+    question: [how-do-i.stop-my-names-clashing-with-a-library]
+    symbolic: [namespace]
+
+- uid: cpp:lang.kw.new
+  kind: keyword
+  name: new
+  domain: language
+  std_since: C++98
+  summary: Allocate and construct an object with dynamic storage duration.
+  intent: >-
+    Create an object that outlives the current scope. In modern C++ prefer
+    make_unique/make_shared; a bare new must be matched by exactly one delete.
+    Placement new constructs into storage you already own.
+  tags: [memory, allocation]
+  keys:
+    canonical: language.memory.allocate-object
+    colloquial: [allocate-on-the-heap, create-an-object-that-outlives-this-scope,
+                 placement-new-into-existing-storage]
+    question: [how-do-i.allocate-an-object-dynamically]
+    problem: [i-need-an-object-to-survive-past-this-function]
+    symbolic: [new, "new[]", placement new]
+
+- uid: cpp:lang.kw.noexcept
+  kind: keyword
+  name: noexcept
+  domain: language
+  std_since: C++11
+  summary: Promise a function throws nothing, or ask whether an expression can throw.
+  intent: >-
+    Both a specifier and an operator. Marking move operations noexcept is what
+    lets std::vector move rather than copy its elements when it grows.
+  tags: [exceptions, performance, contracts]
+  keys:
+    canonical: language.error.no-throw-guarantee
+    colloquial: [promise-not-to-throw, make-vector-move-instead-of-copy,
+                 check-if-an-expression-can-throw]
+    question: [how-do-i.make-my-type-move-efficiently-in-a-vector]
+    problem: [vector-copies-my-elements-when-it-grows]
+    symbolic: [noexcept]
+
+- uid: cpp:lang.kw.nullptr
+  kind: keyword
+  name: nullptr
+  domain: language
+  std_since: C++11
+  summary: The typed null pointer literal.
+  intent: >-
+    Replaces NULL and 0. Because it has its own type, it never accidentally
+    selects an int overload.
+  tags: [pointers, literals, correctness]
+  keys:
+    canonical: language.pointer.null-literal
+    colloquial: [a-pointer-to-nothing, empty-pointer, replace-null]
+    problem: [null-selected-the-wrong-overload]
+    symbolic: [nullptr]
+
+- uid: cpp:lang.kw.operator
+  kind: keyword
+  name: operator
+  domain: language
+  std_since: C++98
+  summary: Introduce an operator overload or a conversion function.
+  intent: >-
+    Give your type natural syntax -- +, ==, [], (), <<, or a conversion. Since
+    C++20, defining <=> and == generates the rest of the comparisons.
+  tags: [operators, overloading, ergonomics]
+  keys:
+    canonical: language.operator.overload
+    colloquial: [overload-an-operator, make-my-type-support-plus,
+                 add-comparison-to-my-type, define-a-conversion-operator]
+    question: [how-do-i.overload-an-operator]
+    symbolic: [operator]
+
+- uid: cpp:lang.kw.private
+  kind: keyword
+  name: private
+  domain: language
+  std_since: C++98
+  summary: Restrict access to the class itself and its friends.
+  intent: Hide implementation detail so invariants cannot be broken from outside.
+  tags: [access-control, oop, encapsulation]
+  keys:
+    canonical: language.access.private
+    colloquial: [hide-this-from-users-of-my-class, make-a-member-inaccessible]
+    symbolic: [private]
+
+- uid: cpp:lang.kw.protected
+  kind: keyword
+  name: protected
+  domain: language
+  std_since: C++98
+  summary: Restrict access to the class, its friends, and its derived classes.
+  intent: Share with subclasses but not with the world.
+  tags: [access-control, oop, inheritance]
+  keys:
+    canonical: language.access.protected
+    colloquial: [visible-to-subclasses-only, share-with-derived-classes]
+    symbolic: [protected]
+
+- uid: cpp:lang.kw.public
+  kind: keyword
+  name: public
+  domain: language
+  std_since: C++98
+  summary: Allow access from anywhere.
+  intent: The class's interface -- what callers are allowed to use.
+  tags: [access-control, oop]
+  keys:
+    canonical: language.access.public
+    colloquial: [make-it-visible-to-everyone, part-of-the-class-interface]
+    symbolic: [public]
+
+- uid: cpp:lang.kw.register
+  kind: keyword
+  name: register
+  domain: language
+  std_since: C++98
+  std_removed: C++17
+  is_deprecated: true
+  summary: Removed storage-class hint asking for a register. Do not use.
+  intent: A vestigial optimisation hint; removed in C++17 and ignored long before that.
+  tags: [deprecated, removed, legacy]
+  keys:
+    canonical: language.storage.register-hint-removed
+    colloquial: [obsolete-register-hint]
+    symbolic: [register]
+
+- uid: cpp:lang.kw.reinterpret_cast
+  kind: keyword
+  name: reinterpret_cast
+  domain: language
+  std_since: C++98
+  summary: Reinterpret a bit pattern as an unrelated pointer or integer type.
+  intent: >-
+    The blunt cast: no checking, no conversion, just "treat these bits as that
+    type". Almost always undefined behaviour to then read through the result --
+    use std::bit_cast or memcpy for type punning instead.
+  tags: [casts, low-level, danger]
+  keys:
+    canonical: language.cast.reinterpret-bits
+    colloquial: [treat-these-bits-as-another-type, pointer-to-integer-cast]
+    question: [how-do-i.convert-a-pointer-to-an-integer]
+    problem: [type-punning-is-undefined-behaviour]
+    symbolic: [reinterpret_cast]
+
+- uid: cpp:lang.kw.requires
+  kind: keyword
+  name: requires
+  domain: language
+  std_since: C++20
+  summary: State a constraint on a template, or open a requires-expression.
+  intent: >-
+    Spell out what operations a type must support. As a clause it constrains a
+    template; as an expression it tests validity and yields bool.
+  tags: [templates, constraints, generics]
+  keys:
+    canonical: language.template.require-constraint
+    colloquial: [require-that-a-type-supports-something, check-if-an-expression-compiles,
+                 replace-enable-if]
+    question: [how-do-i.check-whether-a-type-has-a-member-function]
+    problem: [my-enable-if-sfinae-is-unreadable]
+    symbolic: [requires]
+
+- uid: cpp:lang.kw.return
+  kind: keyword
+  name: return
+  domain: language
+  std_since: C++98
+  summary: Exit a function, optionally handing back a value.
+  intent: Produce the function's result and stop executing it.
+  tags: [control-flow, functions]
+  keys:
+    canonical: language.control.return-value
+    colloquial: [give-back-a-result, exit-the-function, hand-back-a-value]
+    symbolic: [return]
+
+- uid: cpp:lang.kw.short
+  kind: keyword
+  name: short
+  domain: language
+  std_since: C++98
+  summary: A shorter signed integer type, at least 16 bits.
+  intent: Small whole numbers where memory matters.
+  tags: [types, fundamental]
+  keys:
+    canonical: language.type.short-integer
+    colloquial: [a-small-whole-number, 16-bit-integer]
+    symbolic: [short]
+
+- uid: cpp:lang.kw.signed
+  kind: keyword
+  name: signed
+  domain: language
+  std_since: C++98
+  summary: Explicitly request a signed integer type.
+  intent: Mostly used as "signed char", the only way to guarantee a signed byte.
+  tags: [types, fundamental]
+  keys:
+    canonical: language.type.signed-modifier
+    colloquial: [allow-negative-values, signed-byte]
+    symbolic: [signed]
+
+- uid: cpp:lang.kw.sizeof
+  kind: keyword
+  name: sizeof
+  domain: language
+  std_since: C++98
+  summary: Yield the size in bytes of a type or expression.
+  intent: >-
+    Measure storage. "sizeof...(Pack)" counts the elements of a parameter pack.
+    Note it counts bytes, not array elements -- prefer std::size for that.
+  tags: [memory, introspection, templates]
+  keys:
+    canonical: language.memory.size-of-type
+    colloquial: [how-many-bytes-does-this-take, measure-a-type,
+                 count-a-parameter-pack]
+    question: [how-do-i.find-the-size-of-a-type]
+    problem: [sizeof-on-a-pointer-gave-me-8-not-the-array-length]
+    symbolic: [sizeof, "sizeof..."]
+
+- uid: cpp:lang.kw.static
+  kind: keyword
+  name: static
+  domain: language
+  std_since: C++98
+  summary: Give internal linkage, static storage duration, or class-level membership.
+  intent: >-
+    Three distinct meanings by context -- a file-local name, a variable that
+    persists across calls (initialised once, thread-safely since C++11), or a
+    member shared by all instances.
+  tags: [linkage, storage, oop]
+  keys:
+    canonical: language.storage.static-duration
+    colloquial: [keep-a-variable-between-calls, one-copy-shared-by-all-instances,
+                 make-it-file-local, thread-safe-lazy-initialisation]
+    question: [how-do-i.make-a-variable-persist-across-function-calls]
+    symbolic: [static]
+
+- uid: cpp:lang.kw.static_assert
+  kind: keyword
+  name: static_assert
+  domain: language
+  std_since: C++11
+  summary: Fail the compile if a constant condition is false.
+  intent: >-
+    Turn an assumption into a build error with your own message, rather than a
+    runtime surprise. The message is optional since C++17.
+  tags: [compile-time, correctness, diagnostics]
+  keys:
+    canonical: language.compile-time.assert
+    colloquial: [fail-the-build-if-this-is-wrong, check-an-assumption-at-compile-time,
+                 assert-a-type-property]
+    question: [how-do-i.check-a-condition-at-compile-time]
+    symbolic: [static_assert]
+
+- uid: cpp:lang.kw.static_cast
+  kind: keyword
+  name: static_cast
+  domain: language
+  std_since: C++98
+  summary: Perform a checked-at-compile-time conversion between related types.
+  intent: >-
+    The everyday cast: numeric conversions, upcasts, void* back to its real
+    type, and explicit narrowing you want to be visible in the source.
+  tags: [casts, conversions]
+  keys:
+    canonical: language.cast.static-conversion
+    colloquial: [convert-between-number-types, cast-safely-at-compile-time,
+                 silence-a-narrowing-warning]
+    question: [how-do-i.convert-a-double-to-an-int]
+    symbolic: [static_cast]
+
+- uid: cpp:lang.kw.struct
+  kind: keyword
+  name: struct
+  domain: language
+  std_since: C++98
+  summary: Define a class type whose members default to public.
+  intent: >-
+    Conventionally used for plain aggregates of data with no invariant to
+    protect. Otherwise identical to class.
+  tags: [types, aggregates]
+  keys:
+    canonical: language.type.define-struct
+    colloquial: [group-some-fields-together, plain-data-record, define-an-aggregate]
+    question: [how-do-i.define-a-simple-data-holder]
+    symbolic: [struct]
+
+- uid: cpp:lang.kw.switch
+  kind: keyword
+  name: switch
+  domain: language
+  std_since: C++98
+  summary: Branch to one of many labelled cases on an integral or enum value.
+  intent: >-
+    Dispatch on a value. Cases fall through unless you break -- mark deliberate
+    fallthrough with [[fallthrough]].
+  tags: [control-flow, branching]
+  keys:
+    canonical: language.control.switch
+    colloquial: [pick-one-of-many-branches, dispatch-on-an-enum,
+                 replace-a-long-if-else-chain]
+    question: [how-do-i.branch-on-many-values]
+    problem: [my-switch-case-fell-through-by-accident]
+    symbolic: [switch]
+
+- uid: cpp:lang.kw.template
+  kind: keyword
+  name: template
+  domain: language
+  std_since: C++98
+  summary: Define a class, function, variable, or alias parameterised by types or values.
+  intent: >-
+    Write the code once and let it work for every type that satisfies its
+    requirements. The foundation of generic programming in C++.
+  tags: [templates, generics]
+  keys:
+    canonical: language.template.define
+    colloquial: [write-code-that-works-for-any-type, make-it-generic,
+                 avoid-copy-pasting-for-each-type]
+    question: [how-do-i.write-a-generic-function]
+    problem: [i-am-copy-pasting-the-same-function-for-each-type]
+    symbolic: [template]
+
+- uid: cpp:lang.kw.this
+  kind: keyword
+  name: this
+  domain: language
+  std_since: C++98
+  summary: A pointer to the object the member function was called on.
+  intent: >-
+    Refer to the current object -- to disambiguate from a parameter, to return
+    *this for chaining, or to capture the enclosing object in a lambda.
+  tags: [oop, members]
+  keys:
+    canonical: language.object.self-pointer
+    colloquial: [the-current-object, refer-to-myself, return-star-this-for-chaining]
+    question: [how-do-i.return-a-reference-to-the-current-object]
+    symbolic: [this]
+
+- uid: cpp:lang.kw.thread_local
+  kind: keyword
+  name: thread_local
+  domain: language
+  std_since: C++11
+  summary: Give each thread its own independent copy of a variable.
+  intent: >-
+    Per-thread state without locking -- scratch buffers, random engines, error
+    context. Each thread gets its own instance, destroyed when the thread ends.
+  tags: [concurrency, storage, thread-safety]
+  keys:
+    canonical: language.storage.per-thread
+    colloquial: [one-copy-per-thread, thread-private-variable,
+                 avoid-locking-with-per-thread-state]
+    question: [how-do-i.give-each-thread-its-own-copy-of-a-variable]
+    problem: [my-global-is-being-raced-on-by-threads]
+    symbolic: [thread_local]
+
+- uid: cpp:lang.kw.throw
+  kind: keyword
+  name: throw
+  domain: language
+  std_since: C++98
+  summary: Raise an exception, unwinding the stack until a matching catch.
+  intent: >-
+    Signal a failure the current function cannot handle. A bare "throw;" inside
+    a catch block rethrows the active exception, preserving its type.
+  tags: [error-handling, exceptions]
+  keys:
+    canonical: language.error.raise-exception
+    colloquial: [signal-an-error, raise-an-exception, rethrow-the-current-exception]
+    question: [how-do-i.report-an-error-i-cannot-handle-here]
+    symbolic: [throw]
+
+- uid: cpp:lang.kw.true
+  kind: keyword
+  name: 'true'
+  domain: language
+  std_since: C++98
+  summary: The boolean literal for "yes".
+  intent: The true value of type bool.
+  tags: [literals, fundamental]
+  keys:
+    canonical: language.literal.true
+    colloquial: [the-true-value, boolean-yes]
+    symbolic: ['true']
+
+- uid: cpp:lang.kw.try
+  kind: keyword
+  name: try
+  domain: language
+  std_since: C++98
+  summary: Open a block whose exceptions the following catch clauses handle.
+  intent: >-
+    Guard a region of code. A function-try-block wraps a constructor's member
+    initialiser list as well as its body.
+  tags: [error-handling, exceptions]
+  keys:
+    canonical: language.error.guarded-block
+    colloquial: [attempt-something-that-might-fail, guard-this-code-against-errors]
+    question: [how-do-i.handle-errors-from-a-block-of-code]
+    symbolic: [try]
+
+- uid: cpp:lang.kw.typedef
+  kind: keyword
+  name: typedef
+  domain: language
+  std_since: C++98
+  summary: Give an existing type another name.
+  intent: >-
+    The older spelling of a type alias. Prefer "using", which reads left to
+    right and can itself be templated.
+  tags: [types, aliases, legacy]
+  keys:
+    canonical: language.type.legacy-alias
+    colloquial: [give-a-type-a-shorter-name-old-style]
+    symbolic: [typedef]
+
+- uid: cpp:lang.kw.typeid
+  kind: keyword
+  name: typeid
+  domain: language
+  std_since: C++98
+  summary: Obtain runtime type information about an expression or type.
+  intent: >-
+    Ask what type something actually is at run time. Yields a std::type_info;
+    for polymorphic types it reports the dynamic type.
+  tags: [rtti, introspection, polymorphism]
+  keys:
+    canonical: language.type.runtime-type-info
+    colloquial: [what-type-is-this-at-runtime, get-the-dynamic-type,
+                 print-a-type-name]
+    question: [how-do-i.find-out-an-objects-actual-type]
+    symbolic: [typeid]
+
+- uid: cpp:lang.kw.typename
+  kind: keyword
+  name: typename
+  domain: language
+  std_since: C++98
+  summary: Declare a template type parameter, or mark a dependent name as a type.
+  intent: >-
+    Tell the compiler that Something<T>::inner names a type rather than a
+    value. Often required inside templates; optional in more places since C++20.
+  tags: [templates, parsing]
+  keys:
+    canonical: language.template.dependent-type
+    colloquial: [tell-the-compiler-this-dependent-name-is-a-type,
+                 declare-a-template-type-parameter]
+    problem: [need-typename-before-a-dependent-scope]
+    symbolic: [typename]
+
+- uid: cpp:lang.kw.union
+  kind: keyword
+  name: union
+  domain: language
+  std_since: C++98
+  summary: Define a type whose members all share the same storage.
+  intent: >-
+    Overlay several representations on one block of memory. Reading a member
+    other than the one last written is undefined; prefer std::variant, which
+    tracks which member is active.
+  tags: [types, memory, low-level]
+  keys:
+    canonical: language.type.define-union
+    colloquial: [overlap-fields-in-the-same-memory, save-space-with-shared-storage]
+    problem: [reading-the-wrong-union-member-is-undefined]
+    symbolic: [union]
+
+- uid: cpp:lang.kw.unsigned
+  kind: keyword
+  name: unsigned
+  domain: language
+  std_since: C++98
+  summary: Request a non-negative integer type with wraparound arithmetic.
+  intent: >-
+    Values that cannot be negative. Beware: mixing signed and unsigned in a
+    comparison converts the signed operand, and 0u - 1u wraps to a huge number.
+  tags: [types, fundamental]
+  keys:
+    canonical: language.type.unsigned-modifier
+    colloquial: [non-negative-integer, wraparound-arithmetic]
+    problem: [my-unsigned-subtraction-wrapped-around,
+              signed-unsigned-comparison-warning]
+    symbolic: [unsigned]
+
+- uid: cpp:lang.kw.using
+  kind: keyword
+  name: using
+  domain: language
+  std_since: C++98
+  summary: Create a type alias, or bring a name into the current scope.
+  intent: >-
+    Three jobs: "using X = Y" aliases a type (and unlike typedef can be
+    templated), "using namespace N" imports a namespace, and "using Base::f"
+    re-exposes an inherited member.
+  tags: [types, aliases, naming]
+  keys:
+    canonical: language.type.alias
+    colloquial: [give-a-type-a-shorter-name, import-a-namespace,
+                 expose-an-inherited-member, make-a-template-alias]
+    question: [how-do-i.shorten-a-long-type-name]
+    symbolic: [using]
+
+- uid: cpp:lang.kw.virtual
+  kind: keyword
+  name: virtual
+  domain: language
+  std_since: C++98
+  summary: Allow a member function to be overridden and dispatched dynamically.
+  intent: >-
+    Let the derived class decide what happens. A base class with any virtual
+    function needs a virtual (or protected) destructor. "virtual" on a base
+    class means virtual inheritance instead.
+  tags: [oop, polymorphism, inheritance]
+  keys:
+    canonical: language.oop.virtual-dispatch
+    colloquial: [let-subclasses-override-this, call-the-derived-version,
+                 runtime-polymorphism]
+    question: [how-do-i.make-a-function-overridable]
+    problem: [deleting-through-a-base-pointer-leaks]
+    symbolic: [virtual]
+
+- uid: cpp:lang.kw.void
+  kind: keyword
+  name: void
+  domain: language
+  std_since: C++98
+  summary: The incomplete type meaning "no value"; void* means "pointer to anything".
+  intent: Declare that a function returns nothing, or hold an untyped pointer.
+  tags: [types, fundamental]
+  keys:
+    canonical: language.type.no-value
+    colloquial: [returns-nothing, untyped-pointer, pointer-to-anything]
+    symbolic: [void, "void*"]
+
+- uid: cpp:lang.kw.volatile
+  kind: keyword
+  name: volatile
+  domain: language
+  std_since: C++98
+  summary: Forbid the compiler from optimising away accesses to an object.
+  intent: >-
+    For memory-mapped hardware registers and signal handler state. It is NOT a
+    threading tool -- use std::atomic for that.
+  tags: [low-level, hardware, misunderstood]
+  keys:
+    canonical: language.memory.volatile-access
+    colloquial: [do-not-optimise-away-these-reads, memory-mapped-hardware-register]
+    problem: [i-used-volatile-for-thread-safety-and-it-did-not-work]
+    symbolic: [volatile]
+
+- uid: cpp:lang.kw.wchar_t
+  kind: keyword
+  name: wchar_t
+  domain: language
+  std_since: C++98
+  summary: The wide character type, whose width is implementation defined.
+  intent: >-
+    32 bits on Linux, 16 on Windows. Prefer char8_t/char16_t/char32_t for
+    portable Unicode.
+  tags: [types, text]
+  keys:
+    canonical: language.type.wide-character
+    colloquial: [wide-character, platform-wide-char]
+    symbolic: [wchar_t]
+
+- uid: cpp:lang.kw.while
+  kind: keyword
+  name: while
+  domain: language
+  std_since: C++98
+  summary: Repeat a body for as long as a condition holds, testing first.
+  intent: Loop an unknown number of times, possibly zero.
+  tags: [control-flow, loops]
+  keys:
+    canonical: language.control.while-loop
+    colloquial: [keep-going-until-a-condition-changes, loop-an-unknown-number-of-times]
+    question: [how-do-i.loop-until-something-becomes-true]
+    symbolic: [while]
+
+# --- contextual keywords -----------------------------------------------------
+
+- uid: cpp:lang.kw.final
+  kind: keyword
+  name: final
+  domain: language
+  std_since: C++11
+  summary: Forbid further overriding of a virtual function, or further derivation from a class.
+  intent: Close the hierarchy here, which also lets the compiler devirtualise calls.
+  tags: [oop, inheritance, performance]
+  keys:
+    canonical: language.oop.forbid-override
+    colloquial: [stop-anyone-subclassing-this, no-more-overriding,
+                 help-the-compiler-devirtualise]
+    symbolic: [final]
+
+- uid: cpp:lang.kw.override
+  kind: keyword
+  name: override
+  domain: language
+  std_since: C++11
+  summary: Assert that this function overrides a virtual from a base class.
+  intent: >-
+    Cheap insurance: if the signature does not actually match a base virtual,
+    the compiler rejects it instead of silently creating a new function.
+  tags: [oop, inheritance, correctness]
+  keys:
+    canonical: language.oop.assert-override
+    colloquial: [check-that-i-really-am-overriding, catch-a-typo-in-a-virtual-signature]
+    problem: [my-override-is-never-called]
+    symbolic: [override]
+
+- uid: cpp:lang.kw.module
+  kind: keyword
+  name: module
+  domain: language
+  std_since: C++20
+  summary: Declare a module, replacing textual header inclusion.
+  intent: >-
+    Compile an interface once and import it, instead of re-parsing headers in
+    every translation unit. Macros do not leak across a module boundary.
+  tags: [modules, build, organisation]
+  keys:
+    canonical: language.module.declare
+    colloquial: [replace-headers-with-modules, speed-up-my-build,
+                 stop-macros-leaking-between-files]
+    question: [how-do-i.use-c-plus-plus-modules]
+    problem: [my-builds-are-slow-because-of-header-parsing]
+    symbolic: [module]
+
+- uid: cpp:lang.kw.import
+  kind: keyword
+  name: import
+  domain: language
+  std_since: C++20
+  summary: Bring a module's exported names into this translation unit.
+  intent: The module replacement for #include.
+  tags: [modules, build]
+  keys:
+    canonical: language.module.import
+    colloquial: [use-a-module, module-version-of-include]
+    symbolic: [import]
+
+# --- alternative operator spellings -----------------------------------------
+
+- uid: cpp:lang.kw.alt_tokens
+  kind: keyword
+  name: and
+  domain: language
+  std_since: C++98
+  summary: Alternative spellings for logical and bitwise operators.
+  intent: >-
+    and, or, not, not_eq, bitand, bitor, xor, compl, and_eq, or_eq, xor_eq are
+    exact synonyms for &&, ||, !, !=, &, |, ^, ~, &=, |=, ^=. They exist for
+    keyboards lacking those symbols and are rarely used in practice.
+  tags: [operators, legacy, spelling]
+  keys:
+    canonical: language.operator.alternative-spellings
+    colloquial: [word-versions-of-operators, spell-and-instead-of-double-ampersand]
+    symbolic: [and, or, not, not_eq, bitand, bitor, xor, compl, and_eq, or_eq, xor_eq]
