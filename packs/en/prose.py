@@ -18,6 +18,12 @@ from lexicon import MOD_SYNONYMS, RANGE_LIKE
 
 
 def make_summary(rec: dict) -> str:
+    # Python and the shell publish their own descriptions. Nothing derived from
+    # an identifier beats the docstring the author wrote, so prefer it.
+    doc = (rec.get("doc") or "").strip()
+    if doc and rec.get("lang") in ("python", "unix"):
+        return doc if doc.endswith(".") else doc + "."
+
     action, say, mods, nouns, tmpl = keygen.analyse_name(rec["name"])
     obj, _ = keygen.object_of(rec, rec.get("_params", []))
     o = keygen.articled(obj).replace("-", " ")
@@ -72,6 +78,9 @@ def make_intent_text(rec: dict) -> str:
 
     bits = [rec["qualified_name"], rec["name"].replace("_", " "),
             action.replace("-", " ")]
+    # the vendor's own words carry more signal than anything we derive
+    if rec.get("doc"):
+        bits.append(rec["doc"])
     bits += [t.format(o=o).replace("-", " ") if "{o}" in t else t.replace("-", " ")
              for t in say]
     bits += [obj.replace("-", " ")] + [a.replace("-", " ") for a in alts]
@@ -88,6 +97,10 @@ def make_intent_text(rec: dict) -> str:
                     "unordered_map string span or any container or range")
     if rec.get("header"):
         bits.append("header " + rec["header"])
+    # flag descriptions are the searchable surface of a command-line tool
+    for p in rec.get("_params", []):
+        if p.get("doc"):
+            bits.append(f"{p.get('name') or ''} {p['doc']}")
     for p in rec.get("_params", []):
         if p.get("semantic"):
             bits.append(f"{p.get('name') or p.get('role')} is the "

@@ -172,6 +172,34 @@ def derive_emit(rec: dict, params: list[dict], header: str | None):
     """
     q = rec["qualified_name"]
     kind = rec["kind"]
+    lang = rec.get("lang", "cpp")
+
+    # A shell command is not a call: its flags are written inline and there is
+    # nothing to include.
+    if lang == "unix":
+        opts = " ".join(f"[${{{p['name']}}}]" for p in params[:3])
+        return "command", f"{q} {opts} ${{arguments}}".strip(), None, 0.8
+
+    # Python has no include line; the import IS the header, and keyword-only
+    # arguments must be emitted by name or the call will not compile.
+    if lang == "python":
+        parts = []
+        for p in params:
+            n = slot_name(p)
+            if p.get("param_kind") == "var-positional":
+                parts.append(f"*${{{n}}}")
+            elif p.get("param_kind") == "var-keyword":
+                parts.append(f"**${{{n}}}")
+            elif p.get("param_kind") == "keyword-only":
+                parts.append(f"{n}=${{{n}}}")
+            else:
+                parts.append(f"${{{n}}}")
+        call = f"{q}({', '.join(parts)})"
+        if kind == "member_function":
+            method = q.rsplit(".", 1)[-1]
+            call = f"${{object}}.{method}({', '.join(parts)})"
+        return ("method" if kind == "member_function" else "free"), call, \
+            (f"import {rec.get('namespace')}" if rec.get("namespace") else None), 0.85
 
     args = []
     for p in params:

@@ -10,6 +10,7 @@ built once and ATTACHed rather than copied into each pack.
 """
 from __future__ import annotations
 
+import importlib
 import json
 import sqlite3
 import sys
@@ -18,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 ROOT = Path(__file__).resolve().parent.parent
 BASE = ROOT / "out" / "base.db"
+_STRUCTURE: dict = {}
 
 
 def load_constructs(con):
@@ -140,9 +142,26 @@ def main(lang="cpp"):
     # Structural analysis comes from the PROGRAMMING language's module, never
     # from a human-language pack: which parameter is the range and which
     # header to include are the same facts whatever the reader speaks.
-    sys.path.insert(0, str(ROOT / "langs" / lang))
     sys.path.insert(0, str(ROOT / "packs" / "en"))   # codegen/keygen helpers
-    import structure, codegen, keygen, lexicon, lexicon
+    import codegen, keygen, lexicon
+
+    # Each PROGRAMMING language brings its own structural analyser: what a
+    # parameter means is language-specific (C++ has iterator pairs, Python has
+    # keyword-only arguments, a shell tool has flags) even though the resulting
+    # role vocabulary is shared.
+    def structure_for(name):
+        if name in _STRUCTURE:
+            return _STRUCTURE[name]
+        d = ROOT / "langs" / name
+        if not (d / "structure.py").exists():
+            _STRUCTURE[name] = None
+            return None
+        sys.path.insert(0, str(d))
+        mod = importlib.import_module("structure")
+        del sys.modules["structure"]
+        sys.path.pop(0)
+        _STRUCTURE[name] = mod
+        return mod
 
     BASE.parent.mkdir(exist_ok=True)
     if BASE.exists():
@@ -160,6 +179,8 @@ def main(lang="cpp"):
     recs, seen = [], {}
     for f, lang, role in (("raw_decls.jsonl", "cpp", "primary"),
                           ("raw_decls_c.jsonl", "c", "primary"),
+                          ("raw_decls_py.jsonl", "python", "primary"),
+                          ("raw_decls_unix.jsonl", "unix", "primary"),
                           ("raw_decls_libcxx.jsonl", "cpp", "supplementary")):
         path = ROOT / "data" / f
         if not path.exists():
@@ -178,7 +199,8 @@ def main(lang="cpp"):
                 r["impl"] = r.get("impl") or "libc++"
                 added += 1
             else:
-                r.setdefault("impl", "libstdc++" if lang == "cpp" else "glibc")
+                r.setdefault("impl", {"cpp": "libstdc++", "c": "glibc"}
+                             .get(lang, lang))
             seen[key] = r
             recs.append(r)
         if role == "supplementary":
@@ -194,8 +216,18 @@ def main(lang="cpp"):
 
     # roles + home header: structural, from langs/<lang>/structure.py
     for r in recs:
-        r["_params"] = structure.annotate_params(r)
-        r["_home"] = structure.home_header(r.get("file"), r.get("headers") or [])
+        st = structure_for(r.get("lang", "cpp"))
+        if st is None:
+            # No analyser for this language yet: keep the parameters but give
+            # them the keys the shared pipeline expects, rather than failing.
+            r["_params"] = [{**p, "role": p.get("role"),
+                             "semantic": p.get("semantic"),
+                             "optional": p.get("optional", 0)}
+                            for p in r.get("params", [])]
+            r["_home"] = r.get("header")
+        else:
+            r["_params"] = st.annotate_params(r)
+            r["_home"] = st.home_header(r.get("file"), r.get("headers") or [])
     recs = keygen.prepare(recs)
     for r in recs:
         lang = r.get("lang", "cpp")
@@ -208,8 +240,8 @@ def main(lang="cpp"):
                 is_consteval, is_noexcept, is_static, is_const, is_explicit,
                 is_variadic, is_deprecated, std_since, complexity,
                 summary, intent_text, example, source, confidence,
-                is_standard, impl)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (
+                is_standard, impl, doc)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (
             uid, lang, r["kind"], r["name"], r["qualified_name"],
             r.get("namespace"),
             r["qualified_name"].rsplit("::", 1)[0]
@@ -225,7 +257,7 @@ def main(lang="cpp"):
             None, None, None, "libstdcxx-scan", 0.75,
             int(r["qualified_name"].startswith("std::")
                 or r["name"] in lexicon.C_STANDARD),
-            r.get("impl")))
+            r.get("impl"), r.get("brief")))
         eid = con.execute("SELECT id FROM entry WHERE uid=?", (uid,)).fetchone()[0]
         r["_eid"] = eid
 
@@ -235,13 +267,13 @@ def main(lang="cpp"):
         for p in r.get("_params", []):
             con.execute("""INSERT OR IGNORE INTO param(
                     entry_id, ordinal, name, type, canonical_type,
-                    default_value, is_pack, optional, role, semantic)
-                    VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                    default_value, is_pack, optional, role, semantic, doc)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
                         (eid, p.get("ordinal", 0), p.get("name"),
                          p.get("type", "?"), p.get("canonical_type"),
                          p.get("default_value"), int(bool(p.get("is_pack"))),
                          int(bool(p.get("optional"))), p.get("role"),
-                         p.get("semantic")))
+                         p.get("semantic"), p.get("doc")))
 
         ports = codegen.derive_ports(r, r.get("_params", []))
         form, tmpl, inc, conf = codegen.derive_emit(

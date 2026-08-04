@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS entry_tag (
 
 CREATE VIRTUAL TABLE IF NOT EXISTS entry_fts USING fts5(
     keys, name, qualified_name, summary, intent_text, header, tags,
-    content='', tokenize="unicode61 remove_diacritics 2 tokenchars '_:.-'");
+    content='', tokenize="porter unicode61 remove_diacritics 2 tokenchars '_:.-'");
 CREATE VIRTUAL TABLE IF NOT EXISTS key_fts USING fts5(key, tokenize="trigram");
 
 -- ---------------------------------------------------------------- Photon ----

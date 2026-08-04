@@ -49,6 +49,11 @@ CREATE TABLE IF NOT EXISTS entry (
     intent_text     TEXT,                   -- rich paragraph; THIS is what gets embedded
     example         TEXT,                   -- minimal runnable snippet
 
+    doc             TEXT,                   -- the vendor's own one-line
+                                            -- description: docstring first
+                                            -- line, or --help summary. The
+                                            -- best signal for languages whose
+                                            -- identifiers are opaque.
     impl            TEXT,                   -- which stdlib provided it:
                                             -- libstdc++ | libc++ | both
     is_standard     INTEGER DEFAULT 1,      -- 0 = POSIX/vendor, not ISO

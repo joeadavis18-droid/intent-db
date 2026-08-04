@@ -63,6 +63,7 @@ def main(name="en"):
             "ORDER BY ordinal", (r["id"],))]
         r["params"] = r["_params"]
         r["_eid"] = r["id"]
+        r["doc"] = r.get("doc")
         r["_home"] = r["header"]
         r["_primacy"] = keygen.primary_rank_of(r) if hasattr(
             keygen, "primary_rank_of") else keygen.primacy_rank(r, r["_params"])

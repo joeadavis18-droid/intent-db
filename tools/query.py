@@ -214,11 +214,21 @@ def search(con, query: str, limit=10, want_all=False, lang="cpp",
     if words:
         expr = " OR ".join(f'"{w}"' for w in dict.fromkeys(expanded))
         try:
+            # The language restriction must be part of the query. Ranking
+            # globally and filtering afterwards squeezed minority languages out
+            # entirely -- a Unix query returned the top 40 C++ rows, then
+            # discarded all of them.
             for r in con.execute("""
-                    SELECT rowid AS entry_id, bm25(entry_fts, 6,4,4,2,1,1,1) AS s
-                    FROM entry_fts WHERE entry_fts MATCH ?
-                    ORDER BY s LIMIT 40""", (expr,)):
-                add(r["entry_id"], "fts", 1.0 / (1.0 + abs(r["s"])),
+                    SELECT f.rowid AS entry_id,
+                           bm25(entry_fts, 6,4,4,2,1,1,1) AS s
+                    FROM entry_fts f
+                    JOIN base.entry e ON e.id = f.rowid AND e.lang = ?
+                    WHERE entry_fts MATCH ?
+                    ORDER BY s LIMIT 40""", (lang, expr)):
+                # SQLite bm25() returns MORE NEGATIVE for a better match, so
+                # relevance is abs(s). Dividing by it inverted the ranking:
+                # the worst text match scored highest.
+                add(r["entry_id"], "fts", min(abs(r["s"]) / 8.0, 2.0),
                     f"text match (bm25 {r['s']:.1f})")
         except sqlite3.OperationalError:
             pass
@@ -234,7 +244,7 @@ def search(con, query: str, limit=10, want_all=False, lang="cpp",
                     SELECT rowid AS entry_id, bm25(entry_fts, 6,4,4,2,1,1,1) AS s
                     FROM entry_fts WHERE entry_fts MATCH ?
                     ORDER BY s LIMIT 12""", (f'"{a}" AND "{b}"',)):
-                add(r["entry_id"], "pairs", 1.0 / (1.0 + abs(r["s"])),
+                add(r["entry_id"], "pairs", min(abs(r["s"]) / 8.0, 2.0),
                     f"matched '{a} {b}' together")
         except sqlite3.OperationalError:
             pass
@@ -244,9 +254,10 @@ def search(con, query: str, limit=10, want_all=False, lang="cpp",
         try:
             v = embed(query)
             for r in con.execute("""
-                    SELECT entry_id, distance FROM vec_entry
-                    WHERE embedding MATCH ? AND k = 40
-                    ORDER BY distance""", (v.tobytes(),)):
+                    SELECT v.entry_id, v.distance FROM vec_entry v
+                    JOIN base.entry e ON e.id = v.entry_id AND e.lang = ?
+                    WHERE v.embedding MATCH ? AND v.k = 400
+                    ORDER BY v.distance LIMIT 40""", (lang, v.tobytes())):
                 add(r["entry_id"], "vector", max(0.0, 1.0 - r["distance"] / 2.0),
                     f"semantic similarity {1 - r['distance']/2:.2f}")
         except Exception as e:
@@ -262,9 +273,10 @@ def search(con, query: str, limit=10, want_all=False, lang="cpp",
             continue
         rows = con.execute(
             "SELECT id, name FROM base.entry WHERE name = ? COLLATE NOCASE "
+            "AND lang = ? "
             "AND kind IN ('function','function_template','member_function',"
             "'keyword','statement','operator','preprocessor','macro') "
-            "LIMIT 60", (w,)).fetchall()
+            "LIMIT 60", (w, lang)).fetchall()
         share = 1.0 / (len(rows) ** 0.5) if rows else 0.0
         for r in rows:
             if r["id"] in hits:
@@ -277,6 +289,18 @@ def search(con, query: str, limit=10, want_all=False, lang="cpp",
 
 
 def rank(con, hits, limit, locale="en", lang="cpp"):
+    # The language filter has to apply to EVERY stage. Keys resolve through
+    # bindings, which are language-scoped, but full-text and vector matches are
+    # not -- without this, asking in Python returns C++ answers.
+    if lang:
+        keep = {}
+        for eid, h in hits.items():
+            row = con.execute("SELECT lang FROM base.entry WHERE id=?",
+                              (eid,)).fetchone()
+            if row and row[0] == lang:
+                keep[eid] = h
+        hits = keep
+
     exact = any(w.startswith(("exact", "normalised"))
                 for h in hits.values() for w in h["why"])
     if not exact:

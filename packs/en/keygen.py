@@ -177,7 +177,7 @@ def object_of(rec: dict, aparams: list[dict]) -> tuple[str, list[str]]:
             return slug(nouns[0]), [slug(n) for n in nouns[1:]]
         return slug(cls), []
     # Free function: the object is whatever it operates on.
-    roles = {p["role"] for p in aparams}
+    roles = {p.get("role") for p in aparams}
     if "range" in roles or "sentinel" in roles:
         # Nobody says "sort a range of iterators" -- they say "sort a vector".
         # The concrete containers are alternates so the paraphrase fan-out
@@ -201,7 +201,7 @@ def disambiguator(aparams: list[dict]) -> list[str]:
     """Distinguish overloads by what their EXTRA parameters mean."""
     segs = []
     for p in aparams:
-        d = ROLE_DISAMBIG.get(p["role"] or "")
+        d = ROLE_DISAMBIG.get(p.get("role") or "")
         if d and d not in segs:
             segs.append(d)
     # Range/exec are the two that most often distinguish an overload family.
@@ -362,7 +362,7 @@ def macro_concept(rec: dict):
     return f"constant.{slug_name}", "constant", slug_name, [], authored
 
 
-def intent_key_of(rec: dict) -> tuple[str, str, str, list[str]]:
+def intent_key_of(rec: dict) -> tuple[str, str, str, list[str]]:  # noqa: C901
     """The language-neutral identity of what this entry DOES.
 
     -> (intent_key, generic_object, action, qualifiers)
@@ -374,14 +374,58 @@ def intent_key_of(rec: dict) -> tuple[str, str, str, list[str]]:
         k, g, a, q, _ = macro_concept(rec)
         return k, g, a, q
     action, _say, mods, nouns, _sum = analyse_name(rec["name"])
+    # If the identifier yielded no recognised verb, borrow the verb from the
+    # published description: `ls` -> "List information about..." -> list.
+    if (rec.get("lang") in DOC_FIRST_LANGS
+            and action == slug(rec["name"]) and not _say):
+        d = doc_action(rec)
+        if d:
+            action, nouns, mods = d, [], []
     obj, _alts = object_of(rec, rec.get("_params", []))
     generic = GENERIC_OBJECT.get(obj, obj)
     quals = disambiguator(rec.get("_params", []))
     act = ".".join([action] + nouns + mods)
+
+    # A shell command is its own concept. Library functions share concepts
+    # because they are interchangeable implementations of one operation --
+    # vector::push_back and deque::push_back really are the same idea. Commands
+    # are not: ls, lsblk and lsns all "list", but they list different things
+    # and no parameter distinguishes them, so collapsing them made a query for
+    # "list directory contents" resolve to lslocks.
+    if rec.get("lang") == "unix":
+        return f"command.{slug(rec['name'])}.{action}", "command", act, []
+
     key = f"{generic}.{act}" if generic else act
     if quals:
         key += "." + ".".join(quals)
     return key, generic, act, quals
+
+
+# Unix command names are famously opaque -- ls, grep, awk, sed, dd, tr say
+# nothing about what they do -- and the same is true of many Python methods.
+# Where the vendor published a one-line description, that description IS the
+# meaning, and deriving a term from the identifier instead produces nonsense
+# like "ls path, with caller-supplied flags".
+DOC_FIRST_LANGS = {"unix", "python"}
+
+# Leading verb of a description, used to give the concept a real action.
+_DOC_VERB = re.compile(r"^\s*(?:the\s+)?([A-Za-z][a-z]+)")
+
+
+def doc_action(rec: dict) -> str | None:
+    doc = (rec.get("doc") or "").strip()
+    if not doc:
+        return None
+    m = _DOC_VERB.match(doc)
+    if not m:
+        return None
+    word = m.group(1).lower()
+    # third person ("Serializes", "Returns") -> imperative
+    if word.endswith("es") and len(word) > 5:
+        word = word[:-2]
+    elif word.endswith("s") and not word.endswith("ss") and len(word) > 4:
+        word = word[:-1]
+    return word if len(word) > 2 else None
 
 
 def canonical_term(rec: dict) -> tuple[str, str]:
@@ -404,6 +448,13 @@ def _canonical_term_impl(rec: dict) -> tuple[str, str]:
     """
     ikey, generic, act, quals = intent_key_of(rec)
     base_key = f"{generic}.{act}" if generic else act
+
+    # An opaque identifier plus a published description: use the description.
+    if rec.get("lang") in DOC_FIRST_LANGS and rec.get("doc"):
+        t = re.sub(r"\s+", " ", rec["doc"]).strip().rstrip(".")
+        t = re.sub(r"``([^`]+)``", r"\1", t)
+        if len(t) > 8:
+            return (t[:1].lower() + t[1:]), "vendor-doc"
 
     if base_key in DECLARED_TERMS:
         term, source = DECLARED_TERMS[base_key], "declared"
