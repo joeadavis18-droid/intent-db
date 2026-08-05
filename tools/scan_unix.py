@@ -79,9 +79,27 @@ def run_help(path: str) -> str | None:
                 UnicodeDecodeError, MemoryError):
             continue
         text = (p.stdout or "") + "\n" + (p.stderr or "")
-        if len(text.strip()) > 60 and ("-" in text):
+        if len(text.strip()) > 60 and ("-" in text) and not is_error_output(text):
             return text[:200000]
     return None
+
+
+# A command that does not accept --help prints a diagnostic instead. Parsing
+# that as documentation produced aliases like
+# "2026-08-04-09-48-12-filan-2210611-e-unknown-option-help" -- a timestamp and
+# a PID presented as a way to ask for something.
+ERROR_OUTPUT = re.compile(
+    r"unknown option|unrecognized option|invalid option|illegal option"
+    r"|unknown argument|not recognized|No such file|command not found"
+    r"|\bE unknown\b|try '.*--help'|invalid choice", re.I)
+
+# A timestamp or a long digit run is process noise, never documentation.
+NOISE = re.compile(r"\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}|\b\d{6,}\b")
+
+
+def is_error_output(text: str) -> bool:
+    head = text[:600]
+    return bool(ERROR_OUTPUT.search(head) or NOISE.search(head))
 
 
 def parse_flags(text: str) -> list:
@@ -98,6 +116,8 @@ def parse_flags(text: str) -> list:
             continue
         name = long_ or short
         if name in seen:
+            continue
+        if NOISE.search(name) or ERROR_OUTPUT.search(desc or ""):
             continue
         seen.add(name)
         takes_value = bool(arg and arg.strip())

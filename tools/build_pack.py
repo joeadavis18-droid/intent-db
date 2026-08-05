@@ -115,6 +115,9 @@ def main(name="en"):
     # what each concept-scoped item may claim, for the registry check
     import registry as _reg
     pinned = {a.lower(): c for a, c in _reg.load(meta["locale"]).items()}
+    # withdrawn aliases are never reissued: the name is remembered so it
+    # cannot be handed to a different concept later
+    retired = {a.lower() for a in _reg.load_retired(meta["locale"])}
 
     for k, rep in best.items():
         _a, _s, mods, nouns, _sm = keygen.analyse_name(rep["name"])
@@ -158,12 +161,14 @@ def main(name="en"):
                 "_params": [], "_disamb": [],
                 "qualified_name": k, "namespace": None, "_owner_key": k})
 
-    assigned = keygen.assign_keys(items, pinned)
+    assigned = keygen.assign_keys(items, pinned, retired)
     collisions = assigned.pop("_collisions", 0)
     nkeys = 0
     for idx, keys in assigned.items():
         scope, ref = idx
         for kt, key, w in keys:
+            if key.lower() in retired:
+                continue
             col = "concept_id" if scope == "concept" else "entry_id"
             val = made.get(ref) if scope == "concept" else ref
             con.execute(f"""INSERT OR IGNORE INTO semantic_key(

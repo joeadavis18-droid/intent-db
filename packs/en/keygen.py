@@ -689,7 +689,8 @@ def _generated_keys(rec: dict, aparams: list[dict]) -> list[tuple[str, str, floa
     return uniq
 
 
-def assign_keys(entries: list[dict], pinned: dict | None = None
+def assign_keys(entries: list[dict], pinned: dict | None = None,
+                retired: set | None = None
                 ) -> dict[int, list[tuple[str, str, float]]]:
     """
     Global assignment pass. Entries are ranked by primacy; the winner of a
@@ -701,6 +702,7 @@ def assign_keys(entries: list[dict], pinned: dict | None = None
     # An alias already published belongs to whoever published it. A newcomer
     # that wants it is refined instead, exactly as an in-build collision is.
     pinned = pinned or {}
+    retired = retired or set()
     result: dict[int, list] = defaultdict(list)
     collisions = 0
 
@@ -716,6 +718,8 @@ def assign_keys(entries: list[dict], pinned: dict | None = None
         owner = e.get("_owner_key")
         for kt, key, w in e["_cands"]:
             k = key
+            if k.lower() in retired:
+                continue            # withdrawn: never reissued
             held_by = pinned.get(k.lower())
             if held_by is not None and owner is not None and held_by != owner:
                 # published, and not to us

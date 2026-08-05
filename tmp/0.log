@@ -10,21 +10,26 @@ Capture completed.
 BAT analysis: signal has 65536 frames at 44100 Hz, 1 channels, 2 bytes per sample.
 
 Channel 1 - Checking for target frequency 997.00 Hz
-Amplitude: 41736.8; Percentage: [127]
-WARNING: Signal overflow!
-Detected peak at 997.26 Hz of 35.33 dB
- Total 40.9 dB from 985.82 to 1004.66 Hz
+Amplitude: 21970.3; Percentage: [67]
+Detected peak at 86.81 Hz of 22.02 dB
+ Total 26.0 dB from 86.13 to 87.48 Hz
+ FAIL: Peak freq too low 86.81 Hz
+Detected peak at 174.96 Hz of 22.41 dB
+ Total 27.6 dB from 174.96 to 174.96 Hz
+ FAIL: Peak freq too low 174.96 Hz
+Detected peak at 261.76 Hz of 19.67 dB
+ Total 28.8 dB from 261.76 to 262.44 Hz
+ FAIL: Peak freq too low 261.76 Hz
+Detected peak at 349.24 Hz of 21.65 dB
+ Total 29.5 dB from 349.24 to 349.24 Hz
+ FAIL: Peak freq too low 349.24 Hz
+Detected peak at 588.80 Hz of 21.43 dB
+ Total 31.5 dB from 586.78 to 589.47 Hz
+ FAIL: Peak freq too low 588.80 Hz
+Detected peak at 997.26 Hz of 35.37 dB
+ Total 41.4 dB from 985.82 to 1004.66 Hz
  PASS: Peak detected at target frequency
-Detected peak at 2991.10 Hz of 29.42 dB
- Total 41.3 dB from 2989.75 to 2991.77 Hz
- FAIL: Peak freq too high 2991.10 Hz
-Detected peak at 4984.94 Hz of 20.61 dB
- Total 41.3 dB from 4984.94 to 4984.94 Hz
- FAIL: Peak freq too high 4984.94 Hz
-Detected peak at 6978.78 Hz of 19.27 dB
- Total 41.4 dB from 6978.78 to 6978.78 Hz
- FAIL: Peak freq too high 6978.78 Hz
-Detected at least 4 signal(s) in total
+Detected at least 6 signal(s) in total
 
 Return value is -1003
 alsabat -c1 --saveplay default_mono.wav
