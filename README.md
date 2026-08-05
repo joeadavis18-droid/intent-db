@@ -175,8 +175,6 @@ Honest about what is unfinished:
 Almost everything here is **data, not code** — words the lexicon does not know
 yet, or something it got wrong.
 
-- [`SPEC.md`](SPEC.md) — **what this project is**, the decisions already
-  settled and why, and what "done" means. Read this first.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — the five ways in, the file each lives
   in, and how to check your change helped
 - [`GOVERNANCE.md`](GOVERNANCE.md) — branching, review, and how work gets

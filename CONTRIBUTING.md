@@ -13,10 +13,6 @@ Three rules apply to all of them:
 3. **The build stays clean.** `tools/lint.py` must report **0 errors**. It
    enforces the invariants the database depends on, listed at the bottom.
 
-Read [`SPEC.md`](SPEC.md) first — it says what the project is and which
-decisions are already settled, so you do not spend effort on something that
-was decided for a reason.
-
 **Adding words needs no toolchain.** Phrasings and canonical terms feed only
 the semantic layer, which builds against a prebuilt `base.db`:
 
