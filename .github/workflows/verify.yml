@@ -1,0 +1,95 @@
+name: verify
+
+# The promotion gates in GOVERNANCE.md, enforced. A contribution to a data
+# project is measurable, so approval should not rest on a maintainer's mood.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No build artifacts in the diff
+        run: |
+          if git ls-files | grep -qE '^(out/|data/)|\.db$'; then
+            echo "::error::out/ and data/ are build artifacts and must not be committed"
+            git ls-files | grep -E '^(out/|data/)|\.db$'
+            exit 1
+          fi
+          echo "clean"
+
+      - name: Toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang-18 libclang-18-dev g++-14 \
+                                     libc++-18-dev libc++abi-18-dev
+
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+
+      - name: Dependencies
+        run: |
+          python -m venv .venv
+          ./.venv/bin/pip install -q libclang sqlite-vec model2vec pyyaml
+
+      # The scan is deterministic given the scanners and the toolchain, and it
+      # is the slow step. Key the cache on the scanners so a phrasing PR reuses
+      # it and only a scanner change pays for a re-parse.
+      - name: Cache the scan
+        id: scancache
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: scan-${{ runner.os }}-${{ hashFiles('tools/scan_*.py', 'langs/**') }}
+
+      - name: Scan
+        if: steps.scancache.outputs.cache-hit != 'true'
+        run: |
+          ./.venv/bin/python tools/scan_cpp.py
+          ./.venv/bin/python tools/scan_c.py
+          ./.venv/bin/python tools/scan_python.py
+
+      - name: Build
+        run: |
+          ./.venv/bin/python tools/build_base.py
+          ./.venv/bin/python tools/build_pack.py en
+          ./.venv/bin/python tools/embed.py
+
+      - name: Lint — must be 0 errors
+        run: ./.venv/bin/python tools/lint.py
+
+      - name: Retrieval — must not regress
+        run: |
+          ./.venv/bin/python tools/eval.py | tee eval.txt
+          top1=$(grep -oP 'top-1\s+\d+/\d+\s+\(\K\d+' eval.txt)
+          echo "top-1 = ${top1}%"
+          # The floor moves up as the lexicon improves; it never moves down.
+          floor=60
+          if [ "$top1" -lt "$floor" ]; then
+            echo "::error::top-1 ${top1}% is below the ${floor}% floor"
+            exit 1
+          fi
+
+      - name: Round-trip — syntax to intent and back
+        run: |
+          cat > /tmp/rt.cpp <<'CPP'
+          #include <vector>
+          #include <algorithm>
+          int main() {
+              std::vector<int> v;
+              v.push_back(3);
+              std::sort(v.begin(), v.end());
+              std::reverse(v.begin(), v.end());
+          }
+          CPP
+          ./.venv/bin/python tools/explain.py --roundtrip --file /tmp/rt.cpp
+
+      - name: Summary
+        if: always()
+        run: |
+          { echo '### Verification'; echo; sed -n '/^top-1/,$p' eval.txt 2>/dev/null; } \
+            >> "$GITHUB_STEP_SUMMARY" || true

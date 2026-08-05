@@ -155,9 +155,22 @@ Honest about what is unfinished:
 
 ## Contributing
 
-[`CONTRIBUTING.md`](CONTRIBUTING.md) describes each way in, where the files
-live, and how to check your change helped. The short version: every
-contribution is data, every change is measured by `tools/eval.py`, and the
-build must stay at zero lint errors.
+Almost everything here is **data, not code** — words the lexicon does not know
+yet, or something it got wrong.
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — the five ways in, the file each lives
+  in, and how to check your change helped
+- [`GOVERNANCE.md`](GOVERNANCE.md) — branching, review, and how work gets
+  promoted to `main`
+- [`packs/PACK_CONTRACT.md`](packs/PACK_CONTRACT.md) — adding a human language
+
+Contributions here are unusually **measurable**: a phrasing either improves
+retrieval or it does not, and `tools/eval.py` says which. CI enforces that on
+every PR, so approval mostly is not a matter of opinion.
+
+Small changes go straight to a PR. A language pack or a new programming
+surface gets a long-lived branch (`pack/ja`, `lang/rust`) because it is
+additive and isolated — it writes only its own directory and cannot break an
+existing surface.
 
 Licensed Apache-2.0.
