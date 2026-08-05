@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Adding a language pack
+    url: https://github.com/joeadavis18-droid/intent-db/blob/main/packs/PACK_CONTRACT.md
+    about: A pack is authored against the declarations, never translated from another pack. Read the contract first.
+  - name: How to contribute anything else
+    url: https://github.com/joeadavis18-droid/intent-db/blob/main/CONTRIBUTING.md
+    about: Phrasings, canonical terms, advisory edges — where each lives and how to check your change helped.

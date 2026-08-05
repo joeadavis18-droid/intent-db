@@ -36,18 +36,30 @@ Broad on the way in, exact on the way out.
 
 ## What is in it
 
+| surface | declarations | source |
+|---|---:|---|
+| **C++** | 14,249 | libstdc++ 14 + libc++ 18, merged |
+| **C** | 5,774 | glibc — ISO C **and POSIX** (`open`, `mmap`, `socket`, `fork`) |
+| **Python** | 5,513 | CPython 3.12 by runtime introspection |
+| **Unix** | 1,617 | shell commands, 23,219 flags, from `--help` |
+| | **27,153** | |
+
 | | |
 |---|---|
-| declarations | **15,740** — C++ (libstdc++ 14 + libc++ 18) and C (glibc) |
-| concepts | **8,820** language-neutral operations |
-| semantic keys | **222,727** ways to ask for them |
-| canvas ports | **27,101** typed sockets |
-| parameter prompts | **16,127** |
-| advisory edges | 76, across 2 dialects |
+| concepts | **15,101** language-neutral operations |
+| semantic keys | **339,797** ways to ask for them |
+| canvas ports | **70,681** typed sockets |
+| parameter prompts | **59,160** |
+| advisory edges | 79, scoped per dialect |
 
-Everything mechanical is derived from the compiler rather than hand-typed:
-signatures, parameter roles, and `std_since` all come from parsing real headers
-with libclang at each `-std=` level.
+Everything mechanical is derived from the source of truth rather than
+hand-typed: C and C++ from libclang at each `-std=` level, Python from
+`inspect`, shell tools from `--help`. No one enumerated these by hand, and no
+contribution should need to.
+
+Shell commands and the POSIX C API are **different layers, not duplicates**: a
+command is argv and flags, a syscall is a C function with a header. `stat` is
+both, and they are separate entries.
 
 ## Design
 
@@ -115,10 +127,10 @@ Requires clang 18 and GCC 14 headers; libc++ 18 optionally, for `<mdspan>`.
 
 This is the part that does not parallelise inside one head:
 
-- **Semantic phrasings.** 222k aliases sounds like a lot; it is ~25 per concept
+- **Semantic phrasings.** 340k aliases sounds like a lot; it is ~22 per concept
   and generated from templates. Phrasings real people actually type beat
   anything a template produces.
-- **Canonical terms.** Only **255 of 8,820** are hand-declared. The rest are
+- **Canonical terms.** Only **263 of 15,101** are hand-declared. The rest are
   derived, and they get thin in the tail.
 - **Missed coverage.** `<flat_map>` needs GCC 15 / libc++ 19. Beyond that, if
   something you expect is absent, that is a bug worth filing.
@@ -135,7 +147,17 @@ Honest about what is unfinished:
   misresolve on real files with `auto` and templates.
 - No composition: `find` followed by `if (it != end())` is one intent reported
   as two.
-- Rust and Python are planned, not started.
-- Retrieval: top-1 63%, top-5 80%, phrasing agreement 92% (`tools/eval.py`).
+- Rust is planned, not started.
+- Unix retrieval is weak: `rgrep` outranks `grep`. There is no prominence
+  signal in `--help` output, so this needs package provenance, not tuning.
+- Retrieval (C++): top-1 65%, top-5 80%, phrasing agreement 82%
+  (`tools/eval.py`).
+
+## Contributing
+
+[`CONTRIBUTING.md`](CONTRIBUTING.md) describes each way in, where the files
+live, and how to check your change helped. The short version: every
+contribution is data, every change is measured by `tools/eval.py`, and the
+build must stay at zero lint errors.
 
 Licensed Apache-2.0.

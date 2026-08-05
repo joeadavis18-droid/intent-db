@@ -1,0 +1,34 @@
+name: Missing coverage
+description: Something you expected is not in the lexicon
+labels: [coverage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Declarations are extracted mechanically, so a missing symbol is a
+        scanner bug rather than something to type in by hand.
+  - type: input
+    attributes:
+      label: Symbol
+      placeholder: "std::flat_map  /  epoll_create1  /  itertools.batched"
+    validations: {required: true}
+  - type: dropdown
+    attributes:
+      label: Surface
+      options: [C++, C, Python, Unix command, other]
+    validations: {required: true}
+  - type: input
+    attributes:
+      label: Where it should come from
+      placeholder: "<flat_map>  /  sys/epoll.h  /  import itertools  /  coreutils"
+  - type: textarea
+    attributes:
+      label: What you checked
+      description: Optional, but it saves a round trip.
+      value: |
+        ```bash
+        ./.venv/bin/python -c "
+        import sqlite3; con = sqlite3.connect('out/base.db')
+        print(con.execute('SELECT lang, header, std_since FROM entry WHERE qualified_name=?',
+                          ('PUT_SYMBOL_HERE',)).fetchall())"
+        ```

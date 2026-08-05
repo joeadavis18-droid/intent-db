@@ -1,0 +1,31 @@
+name: Wrong or missing answer
+description: A lookup returned the wrong thing, or nothing
+labels: [retrieval]
+body:
+  - type: input
+    attributes:
+      label: What you asked
+      placeholder: "search files for a pattern"
+    validations: {required: true}
+  - type: input
+    attributes:
+      label: What came back
+      placeholder: "rgrep  (or: no match)"
+    validations: {required: true}
+  - type: input
+    attributes:
+      label: What it should have been
+      placeholder: "grep"
+    validations: {required: true}
+  - type: dropdown
+    attributes:
+      label: Language
+      options: [cpp, c, python, unix]
+    validations: {required: true}
+  - type: textarea
+    attributes:
+      label: Why the expected answer is right
+      description: |
+        Especially useful when both answers are defensible. If the two are
+        genuinely different operations, say what distinguishes them — that is
+        usually a concept-partition bug rather than a ranking one.
