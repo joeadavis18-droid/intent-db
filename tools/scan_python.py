@@ -83,7 +83,7 @@ def params_of(obj) -> tuple[list, str | None, bool]:
                               else repr(p.default)[:80]),
             "is_pack": kind in ("var-positional", "var-keyword"),
             # Python's calling convention IS part of the API: a keyword-only
-            # argument cannot be passed positionally, and the IDE must know.
+            # argument cannot be passed positionally, so it must be recorded.
             "param_kind": kind,
         })
     return out, annotation_of(sig.return_annotation), variadic

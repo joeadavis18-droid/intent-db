@@ -1191,11 +1191,11 @@ DECLARED_TERMS = {
 
 
 # ============================================================================
-# PARAMETER PROMPTS
+# PARAMETER DOCUMENTATION
 # ----------------------------------------------------------------------------
-# What the IDE puts in the popup when a parameter must be satisfied. Keyed by
-# port kind; PARAM_OVERRIDES handles the cases where the generic wording would
-# be wrong or would omit a real precondition.
+# How to supply a parameter: what it is, what counts as valid, and why. Keyed
+# by port kind; PARAM_OVERRIDES handles the cases where the generic wording
+# would be wrong or would omit a real precondition.
 #
 # Constraints here must be TRUE. An invented rule ("sizes must be multiples of
 # 8") is worse than none: it teaches a false fact to exactly the developer who
@@ -1256,8 +1256,8 @@ PROMPTS = {
                    "help": "The object the call acts on.",
                    "input_kind": "identifier", "example": "v"},
     "sequence":   {"prompt": "Which range?",
-                   "help": "Wire a container or range. Begin and end are "
-                           "supplied for you.",
+                   "help": "A container or range. Begin and end are derived "
+                           "from it.",
                    "input_kind": "inferred", "example": "v"},
     "pack":       {"prompt": "Which arguments?",
                    "help": "Any number of arguments, forwarded to the "
@@ -1322,9 +1322,9 @@ KIND_CONSTRAINTS = {
 # ============================================================================
 # TEACHING HELP
 # ----------------------------------------------------------------------------
-# The popup is read by someone who may not know what a variable IS. A rule
-# ("must be a valid identifier") is not enough on its own; the help says what
-# the thing is and why it matters. Constraints validate, help teaches.
+# Read by someone who may not know what a variable IS. A rule ("must be a
+# valid identifier") is not enough on its own; the help says what the thing is
+# and why it matters. Constraints validate, help teaches.
 # ============================================================================
 
 SLOT_HELP = {

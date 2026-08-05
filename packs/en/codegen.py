@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """
-codegen.py -- turn an entry into (a) emittable syntax and (b) canvas ports.
+codegen.py -- emittable syntax, and parameters grouped into logical inputs.
 
-Both IDE scenarios consume this:
+Two derived facts about every declaration:
 
-  intent -> syntax   needs a template with named slots plus the include line,
-                     so "sort a vector" compiles to
-                         #include <algorithm>
-                         std::sort(v.begin(), v.end());
+  emit template   the call, with named slots and the include line, so the
+                  syntax can be reconstructed:
+                      #include <algorithm>
+                      std::sort(v.begin(), v.end());
 
-  visual canvas      needs PORTS. A parameter list is the wrong abstraction for
-                     a node: std::sort has two iterator parameters but exactly
-                     one logical input, a sequence. Ports group the parameters
-                     that belong to one socket, so the canvas draws what a
-                     person actually wires.
+  ports           a parameter LIST is not the same as a function's logical
+                  inputs. std::sort takes two iterators but has one logical
+                  input: a sequence. A port records which parameters belong
+                  together and what each group means.
 """
 from __future__ import annotations
 
@@ -44,7 +43,8 @@ def _is_member(rec: dict) -> bool:
 
 
 def prompt_spec(rec: dict, port: dict, param: dict | None) -> dict:
-    """Everything the IDE needs to render a popup for one socket.
+    """How to supply this parameter: what kind of value, what rule it must
+    satisfy, and an example.
 
     Structural half (widget, rule, seed) -- the wording half lives in the pack.
     A constraint is only emitted when it is TRUE for this function: an invented
@@ -77,11 +77,11 @@ def slot_name(p: dict) -> str:
 # ------------------------------------------------------------------ ports ---
 
 def derive_ports(rec: dict, params: list[dict]) -> list[dict]:
-    """Group parameters into logical sockets. Order is the canvas order."""
+    """Group parameters into logical inputs, in declaration order."""
     ports: list[dict] = []
     used: set[int] = set()
 
-    # 1. the receiver, for member calls -- the thing you drag the node onto
+    # 1. the receiver, for member calls -- the object the call acts on
     if _is_member(rec):
         parent = rec["qualified_name"].rsplit("::", 1)[0]
         ports.append({
@@ -91,7 +91,7 @@ def derive_ports(rec: dict, params: list[dict]) -> list[dict]:
             "doc": f"the {parent.rsplit('::', 1)[-1]} the call acts on",
         })
 
-    # 2. an iterator pair is ONE sequence socket, not two
+    # 2. an iterator pair is ONE logical input, not two
     seq = [p for p in params if (p.get("semantic") in SEQUENCE_SEMANTICS)]
     if seq:
         ports.append({
@@ -99,7 +99,7 @@ def derive_ports(rec: dict, params: list[dict]) -> list[dict]:
             "type": seq[0].get("type"), "required": 1, "variadic": 0,
             "param_ids": [p["ordinal"] for p in seq],
             "slot": "sequence",
-            "doc": "the range to operate on; expands to begin/end at emit time",
+            "doc": "the range operated on; expands to begin/end at emit time",
         })
         used.update(p["ordinal"] for p in seq)
 
@@ -114,7 +114,7 @@ def derive_ports(rec: dict, params: list[dict]) -> list[dict]:
         })
         used.update(p["ordinal"] for p in dest)
 
-    # 3. everything else is its own socket
+    # 3. everything else is its own input
     for p in params:
         if p["ordinal"] in used:
             continue
@@ -167,8 +167,8 @@ def derive_emit(rec: dict, params: list[dict], header: str | None):
     """-> (form, template, include, confidence)
 
     Slots are ${name}. The sequence slot is emitted as two arguments because
-    that is what the call actually takes -- the canvas hides the pair, the
-    emitter does not.
+    that is what the call actually takes: the grouping is a property of the
+    port, not of the emitted syntax.
     """
     q = rec["qualified_name"]
     kind = rec["kind"]
@@ -237,8 +237,8 @@ def derive_emit(rec: dict, params: list[dict], header: str | None):
 
 
 def render(template: str, bindings: dict[str, str]) -> str:
-    """Fill ${slots}. Unbound slots stay visible as <name> placeholders so the
-    IDE can show the user exactly what is still missing."""
+    """Fill ${slots}. Unbound slots stay visible as <name> placeholders, so
+    what is still required is explicit rather than silently omitted."""
     def sub(m):
         k = m.group(1)
         return bindings.get(k, f"<{k}>")

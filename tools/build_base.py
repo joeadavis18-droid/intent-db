@@ -3,7 +3,7 @@
 build_base.py -- the syntax layer. Built once, shared by every language pack.
 
 Everything here comes from clang: declarations, parameters and the roles they
-play, canvas ports, emit templates. No human language is involved, so this is
+play, their logical inputs, emit templates. No human language is involved, so
 built once and ATTACHed rather than copied into each pack.
 
     build_base.py   ->  out/base.db

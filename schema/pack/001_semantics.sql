@@ -70,9 +70,10 @@ CREATE TABLE IF NOT EXISTS connective (
     value TEXT NOT NULL
 );
 
--- The WORDS of a parameter prompt, in this pack's language. Separate from the
--- structural half in base.port so a language pack can rewrite every question
--- without touching validation, and so validation cannot drift per language.
+-- The WORDS describing how to supply a parameter, in this pack's language.
+-- Separate from the structural half in base.port so a language pack can
+-- rewrite every description without touching validation, and so validation
+-- cannot drift per language.
 CREATE TABLE IF NOT EXISTS port_prompt (
     entry_id INTEGER NOT NULL,      -- -> base.entry(id)
     slot     TEXT NOT NULL,
@@ -81,16 +82,16 @@ CREATE TABLE IF NOT EXISTS port_prompt (
     PRIMARY KEY (entry_id, slot)
 );
 
--- Enumerated options for a slot, each carrying its own explanation, so the
--- popup can offer a dropdown where every choice teaches what it is. Lives in
--- the pack because the explanations are the substance and they are language-
--- specific; the values themselves are C++ tokens and travel with them.
+-- Enumerated options for a slot, each carrying its own explanation, so every
+-- valid choice is documented rather than merely listed. Lives in the pack
+-- because the explanations are the substance and they are language-specific;
+-- the values themselves are tokens and travel with them.
 CREATE TABLE IF NOT EXISTS port_choice (
     entry_id INTEGER NOT NULL,
     slot     TEXT NOT NULL,
     ordinal  INTEGER NOT NULL,
     value    TEXT NOT NULL,     -- the token emitted: 'int'
-    label    TEXT,              -- what to show: 'whole number'
+    label    TEXT,              -- short name: 'whole number'
     help     TEXT,              -- what it MEANS, for someone who does not know
     PRIMARY KEY (entry_id, slot, ordinal)
 );

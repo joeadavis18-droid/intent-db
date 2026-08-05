@@ -178,7 +178,7 @@ def main(locale="en"):
         print(f"  concepts reachable in {row['langs']} language(s): {row['n']}")
     print(f"  emittable entries: " + str(con.execute(
         "SELECT count(*) FROM base.entry WHERE emit_confidence>=0.6").fetchone()[0]))
-    print(f"  canvas ports:      " + str(con.execute(
+    print(f"  logical inputs:    " + str(con.execute(
         "SELECT count(*) FROM base.port").fetchone()[0]))
 
     print("\n-- by standard " + "-" * 47)

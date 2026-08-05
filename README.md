@@ -51,8 +51,8 @@ Broad on the way in, exact on the way out.
 |---|---|
 | concepts | **15,101** language-neutral operations |
 | semantic keys | **339,797** ways to ask for them |
-| canvas ports | **70,681** typed sockets |
-| parameter prompts | **59,160** |
+| logical inputs | **70,681** parameters grouped into typed inputs |
+| usage notes | **59,160** — how to supply each parameter |
 | advisory edges | 79, scoped per dialect |
 
 Everything mechanical is derived from the source of truth rather than

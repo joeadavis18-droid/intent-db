@@ -3,9 +3,9 @@
 langs/python/structure.py -- structural analysis of Python declarations.
 
 Python's calling convention is part of its API in a way C++'s is not: an
-argument that is keyword-only cannot be passed positionally, and the IDE has to
-know which is which before it can prompt. `inspect` already told us, so this
-mostly translates that into the shared role vocabulary.
+argument that is keyword-only cannot be passed positionally, and that has to be
+recorded. `inspect` already told us, so this mostly translates it into the
+shared role vocabulary.
 """
 from __future__ import annotations
 

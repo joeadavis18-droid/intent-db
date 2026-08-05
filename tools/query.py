@@ -433,7 +433,7 @@ def main():
     ap.add_argument("--emit", action="store_true",
                     help="intent -> syntax: print the emittable call")
     ap.add_argument("--ports", action="store_true",
-                    help="canvas: print the node's sockets")
+                    help="print the function's logical inputs and outputs")
     ap.add_argument("--strict", action="store_true",
                     help="one answer or none; refuse to guess when ambiguous")
     a = ap.parse_args()
@@ -445,7 +445,7 @@ def main():
     if a.strict:
         # Intent -> syntax compilation must not guess. Emit only when the top
         # hit is clearly ahead of the runner-up; otherwise report ambiguity so
-        # the IDE can ask rather than silently produce the wrong call.
+        # what is still required is explicit, rather than a silently wrong call.
         if not recs:
             print("no match", file=sys.stderr)
             return 1

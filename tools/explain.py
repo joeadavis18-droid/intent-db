@@ -441,7 +441,7 @@ def advisories(con, items, dialect="cpp"):
     """Design review, driven by the lexicon rather than a separate rule engine.
 
     Every finding is an edge someone declared in advice/cpp.yaml, so the review
-    can never drift from what the popups teach -- the same row produces both.
+    can never drift from what the documentation says -- one row produces both.
     """
     out = []
     for d in items:

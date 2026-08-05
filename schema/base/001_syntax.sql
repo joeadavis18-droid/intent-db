@@ -1,7 +1,7 @@
 -- BASE :: the syntax layer. Language-NEUTRAL and shared by every pack.
 --
 -- This is what clang produced: declarations, parameters, the roles those
--- parameters play, canvas ports, and the emit templates. None of it depends on
+-- parameters play, their logical inputs, and the emit templates. None of it depends on
 -- a human language, so it is built once and ATTACHed by each pack rather than
 -- duplicated into all of them.
 --
@@ -122,29 +122,29 @@ CREATE TABLE IF NOT EXISTS raw_decl (
     payload     TEXT NOT NULL        -- JSON blob straight from the scanner
 );
 
--- Codegen + canvas layer.
+-- Emit + logical-input layer.
 --
 -- Two consumers drive this schema:
---   1. intent -> syntax compilation. An intent must resolve to ONE entry and
---      emit compilable text, so `emit_template` carries slots and `emit_form`
---      says how the call is spelled (free / method / static / ctor / operator).
---   2. visual canvas. A node needs PORTS, not parameters. std::sort takes two
---      iterator parameters but has ONE logical input: a sequence. `port`
---      groups the underlying params so the canvas draws one socket.
+--   1. reconstructing the call. `emit_template` carries named slots and
+--      `emit_form` says how the call is spelled (free / method / static /
+--      ctor / operator), so the syntax can be produced from the record.
+--   2. logical inputs. A parameter LIST is not a function's set of logical
+--      inputs. std::sort takes two iterator parameters but has ONE logical
+--      input: a sequence. `port` records that grouping and what it means.
 
 ALTER TABLE entry ADD COLUMN emit_form TEXT;       -- free|method|static|ctor|operator|construct
 ALTER TABLE entry ADD COLUMN emit_template TEXT;   -- 'std::sort(${first}, ${last})'
 ALTER TABLE entry ADD COLUMN emit_include TEXT;    -- '#include <algorithm>'
 ALTER TABLE entry ADD COLUMN emit_confidence REAL DEFAULT 0.0;
 
--- One row per logical socket on the canvas node.
+-- One row per logical input of the function.
 CREATE TABLE IF NOT EXISTS port (
     id          INTEGER PRIMARY KEY,
     entry_id    INTEGER NOT NULL REFERENCES entry(id) ON DELETE CASCADE,
     direction   TEXT NOT NULL,      -- in | out | inout
     ordinal     INTEGER NOT NULL,
     label       TEXT NOT NULL,      -- 'sequence', 'comparator', 'result'
-    port_kind   TEXT NOT NULL,      -- see CHECK below: drives socket shape/colour
+    port_kind   TEXT NOT NULL,      -- see CHECK below: what kind of thing it is
     type        TEXT,               -- C++ type, or the element/iterator type
     required    INTEGER DEFAULT 1,
     variadic    INTEGER DEFAULT 0,
@@ -152,10 +152,9 @@ CREATE TABLE IF NOT EXISTS port (
     slot        TEXT,               -- name of the emit_template slot it fills
     doc         TEXT,
 
-    -- What the IDE needs to RENDER a prompt for this socket. Structural and
-    -- language-neutral: the widget to show, the rule to validate against, a
-    -- seed value. The WORDS live in the pack (port_prompt), because they are
-    -- language-specific; these three are not.
+    -- How this parameter is supplied. Structural and language-neutral: what
+    -- kind of value, the rule it must satisfy, an example. The WORDS live in
+    -- the pack (port_prompt); these three do not vary by language.
     input_kind      TEXT,           -- number|expression|lambda|identifier|
                                     -- path|type|enum|text|inferred|produced
     constraint_rule TEXT,           -- machine-checkable rule, or a stated
@@ -175,8 +174,8 @@ CREATE TABLE IF NOT EXISTS port (
 CREATE INDEX IF NOT EXISTS idx_port_entry ON port(entry_id, direction);
 CREATE INDEX IF NOT EXISTS idx_port_kind  ON port(port_kind);
 
--- Which port kinds may legally be wired together on the canvas. Deliberately a
--- table rather than code so the IDE can query it and grey out bad drops.
+-- Which port kinds are compatible: whether one function's output can supply
+-- another's input. A table rather than code, so it can be queried.
 CREATE TABLE IF NOT EXISTS port_compat (
     out_kind    TEXT NOT NULL,
     in_kind     TEXT NOT NULL,
@@ -185,13 +184,13 @@ CREATE TABLE IF NOT EXISTS port_compat (
 );
 
 INSERT OR IGNORE INTO port_compat (out_kind, in_kind, note) VALUES
-    ('sequence','sequence','a range feeds any range-taking node'),
+    ('sequence','sequence','a range satisfies any range-taking input'),
     ('sequence','value',   'a range can be reduced to a value downstream'),
     ('result',  'value',   'a returned value feeds a value socket'),
     ('result',  'sequence','a returned container feeds a range socket'),
     ('result',  'count',   'a returned size feeds a count socket'),
     ('result',  'position','a returned iterator feeds a position socket'),
-    ('result',  'object',  'a returned object feeds a method receiver'),
+    ('result',  'object',  'a returned object can receive a method call'),
     ('result',  'path',    'a returned path feeds a path socket'),
     ('value',   'value',   NULL),
     ('value',   'count',   NULL),
