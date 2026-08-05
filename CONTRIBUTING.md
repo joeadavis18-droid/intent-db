@@ -13,13 +13,21 @@ Three rules apply to all of them:
 3. **The build stays clean.** `tools/lint.py` must report **0 errors**. It
    enforces the invariants the database depends on, listed at the bottom.
 
+Read [`SPEC.md`](SPEC.md) first — it says what the project is and which
+decisions are already settled, so you do not spend effort on something that
+was decided for a reason.
+
+**Adding words needs no toolchain.** Phrasings and canonical terms feed only
+the semantic layer, which builds against a prebuilt `base.db`:
+
 ```bash
 python3 -m venv .venv
-./.venv/bin/pip install libclang sqlite-vec model2vec pyyaml
-make scan                     # once, ~5 min
-make                          # build + embed + lint
-./.venv/bin/python tools/eval.py
+./.venv/bin/pip install sqlite-vec model2vec pyyaml
+# download base.db from Releases into out/
+make words                    # ~30 seconds: rebuild, embed, lint, measure
 ```
+
+Only changing a **scanner** needs clang, GCC 14 headers and `make scan`.
 
 ---
 

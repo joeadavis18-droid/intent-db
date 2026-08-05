@@ -1,7 +1,10 @@
-# intent_db — a bidirectional lexicon of programming intent
+# intent_db — a lexicon of programming intent
 
-Look up a function by **what you are trying to do**, and read existing code back
-as **what it means**.
+**Compiling all known code into a database with semantic keys.**
+
+Not a library and not a tool: a *lexicon*. The deliverable is the data. Look up
+a function by **what you are trying to do**, and read existing code back as
+**what it means**.
 
 ```
 $ intentq "grab some memory"
@@ -111,17 +114,31 @@ obligation: exactly one precise phrase per concept, stored separately, and it is
 what the system says back. `std::vector::push_back` has 141 aliases and one
 term — *"append an element to the end of a sequence"*.
 
-## Build
+## Using it
 
 ```bash
 python3 -m venv .venv
-./.venv/bin/pip install libclang sqlite-vec model2vec pyyaml
-make scan     # parse the standard libraries      (~5 min, needs clang)
-make          # build base.db + pack_en.db, embed, lint
+./.venv/bin/pip install sqlite-vec model2vec pyyaml
+# download base.db + pack_en.db from Releases, into out/
 ./.venv/bin/python tools/query.py "sort a vector"
 ```
 
-Requires clang 18 and GCC 14 headers; libc++ 18 optionally, for `<mdspan>`.
+**Adding words needs nothing more than that.** Edit a data file, then:
+
+```bash
+make words        # ~30 seconds: rebuild, embed, lint, measure
+```
+
+### Rebuilding the declarations themselves
+
+Only needed if you are changing a *scanner*. This is the part that wants a
+toolchain — clang 18, GCC 14 headers, optionally libc++ 18 for `<mdspan>`:
+
+```bash
+./.venv/bin/pip install libclang
+make scan         # re-parse the standard libraries (~5 min)
+make
+```
 
 ## Where it needs help
 
@@ -158,6 +175,8 @@ Honest about what is unfinished:
 Almost everything here is **data, not code** — words the lexicon does not know
 yet, or something it got wrong.
 
+- [`SPEC.md`](SPEC.md) — **what this project is**, the decisions already
+  settled and why, and what "done" means. Read this first.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — the five ways in, the file each lives
   in, and how to check your change helped
 - [`GOVERNANCE.md`](GOVERNANCE.md) — branching, review, and how work gets

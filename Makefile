@@ -1,10 +1,15 @@
 PY := ./.venv/bin/python
 PACK ?= en
 
-.PHONY: all scan base pack embed lint eval check rebuild clean
+.PHONY: all words scan base pack embed lint eval check rebuild clean
 
 ## The normal loop after editing a pack's lexicon.
 all: pack embed lint
+
+## words -- THE CONTRIBUTOR LOOP. Rebuilds the semantic layer from the data
+##          files against a prebuilt base.db. No clang, no scan, ~30 seconds.
+##          Editing phrasings or canonical terms needs nothing else.
+words: pack embed lint eval
 
 ## scan  -- re-parse libstdc++ (~4 min). Only after a toolchain change or an
 ##          edit to the header list in tools/scan_cpp.py.
