@@ -26,6 +26,7 @@ def load_pack(name: str):
     d = ROOT / "packs" / name
     if not (d / "lexicon.py").exists():
         sys.exit(f"no pack at {d}")
+    sys.path.insert(0, str(ROOT / "tools"))
     sys.path.insert(0, str(d))
     import lexicon, keygen, codegen, prose
     import yaml
@@ -111,6 +112,10 @@ def main(name="en"):
         k = r["_concept_key"]
         if k not in best or r["_primacy"] < best[k]["_primacy"]:
             best[k] = r
+    # what each concept-scoped item may claim, for the registry check
+    import registry as _reg
+    pinned = {a.lower(): c for a, c in _reg.load(meta["locale"]).items()}
+
     for k, rep in best.items():
         _a, _s, mods, nouns, _sm = keygen.analyse_name(rep["name"])
         quals = keygen.disambiguator(rep["_params"])
@@ -126,7 +131,7 @@ def main(name="en"):
             "_primacy": (len(quals) + len(nouns), spec, len(mods))
                         + tuple(rep["_primacy"]),
             "_params": rep["_params"], "_disamb": mods + nouns + quals,
-            "qualified_name": k, "namespace": None})
+            "qualified_name": k, "namespace": None, "_owner_key": k})
     for r in recs:
         items.append({
             "_idx": ("entry", r["_eid"]), "_needs_canonical": False,
@@ -151,9 +156,9 @@ def main(name="en"):
                 "_cands": [("colloquial", as_key, 9.5)],
                 "_primacy": (-1,) + tuple(best[k]["_primacy"]),
                 "_params": [], "_disamb": [],
-                "qualified_name": k, "namespace": None})
+                "qualified_name": k, "namespace": None, "_owner_key": k})
 
-    assigned = keygen.assign_keys(items)
+    assigned = keygen.assign_keys(items, pinned)
     collisions = assigned.pop("_collisions", 0)
     nkeys = 0
     for idx, keys in assigned.items():
@@ -257,6 +262,22 @@ def main(name="en"):
             con.execute("INSERT OR REPLACE INTO advice_text VALUES (?,?,?)",
                         (k, v["headline"], v["rationale"]))
         print(f"  advice text: {len(_y.safe_load(af.read_text()))} rationales")
+
+    # register every concept alias, so the next build cannot move it
+    fresh = {}
+    for idx, keys in assigned.items():
+        scope, ref = idx
+        if scope == "concept":
+            for kt, key, _w in keys:
+                fresh[key] = ref
+    additions, violations = _reg.reconcile(meta["locale"], fresh)
+    if violations:
+        print(f"  !! {len(violations)} alias(es) tried to move; refused")
+        for a, was, now in violations[:3]:
+            print(f"       '{a}': {was} -> {now}")
+    merged = {**_reg.load(meta["locale"]), **additions}
+    _reg.save(meta["locale"], merged)
+    print(f"  registry: {len(merged)} pinned (+{len(additions)} new)")
 
     build_fts(con)
     con.commit()

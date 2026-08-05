@@ -689,7 +689,8 @@ def _generated_keys(rec: dict, aparams: list[dict]) -> list[tuple[str, str, floa
     return uniq
 
 
-def assign_keys(entries: list[dict]) -> dict[int, list[tuple[str, str, float]]]:
+def assign_keys(entries: list[dict], pinned: dict | None = None
+                ) -> dict[int, list[tuple[str, str, float]]]:
     """
     Global assignment pass. Entries are ranked by primacy; the winner of a
     contested key keeps it and losers fall back to a longer specific form.
@@ -697,6 +698,9 @@ def assign_keys(entries: list[dict]) -> dict[int, list[tuple[str, str, float]]]:
     """
     ranked = sorted(entries, key=lambda e: e["_primacy"])
     taken: dict[str, int] = {}
+    # An alias already published belongs to whoever published it. A newcomer
+    # that wants it is refined instead, exactly as an in-build collision is.
+    pinned = pinned or {}
     result: dict[int, list] = defaultdict(list)
     collisions = 0
 
@@ -709,8 +713,29 @@ def assign_keys(entries: list[dict]) -> dict[int, list[tuple[str, str, float]]]:
         refine = [*e.get("_disamb", []), *refine_hints(e),
                   f"arity-{len(e['_params'])}"]
 
+        owner = e.get("_owner_key")
         for kt, key, w in e["_cands"]:
             k = key
+            held_by = pinned.get(k.lower())
+            if held_by is not None and owner is not None and held_by != owner:
+                # published, and not to us
+                collisions += 1
+                sep = "-" if kt in ("colloquial", "question") else "."
+                for suffix in refine:
+                    if not suffix:
+                        continue
+                    trial = f"{k}{sep}{slug(suffix)}"
+                    if (trial.lower() not in taken
+                            and pinned.get(trial.lower(), owner) == owner):
+                        k = trial
+                        break
+                else:
+                    if kt != "canonical":
+                        continue
+                    n = 2
+                    while f"{k}.v{n}".lower() in taken:
+                        n += 1
+                    k = f"{k}.v{n}"
             if k.lower() in taken:
                 collisions += 1
                 sep = "-" if kt in ("colloquial", "question") else "."

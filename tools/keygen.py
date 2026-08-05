@@ -600,7 +600,8 @@ def _generated_keys(rec: dict, aparams: list[dict]) -> list[tuple[str, str, floa
     return uniq
 
 
-def assign_keys(entries: list[dict]) -> dict[int, list[tuple[str, str, float]]]:
+def assign_keys(entries: list[dict], pinned: dict | None = None
+                ) -> dict[int, list[tuple[str, str, float]]]:
     """
     Global assignment pass. Entries are ranked by primacy; the winner of a
     contested key keeps it and losers fall back to a longer specific form.
