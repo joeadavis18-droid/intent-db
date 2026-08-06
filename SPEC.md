@@ -1,10 +1,36 @@
 # intent_db — specification
 
-**Status:** 2026-08-04. §1–§2 are the project definition. §3 is measured, never
-recalled. §4 records implementation decisions so they are visible and
-reversible. §5 is open and is never closed by inference.
+**Status:** 2026-08-04. §0 is the goal and §1–§2 the definition. §3 is
+measured, never recalled. §4 records implementation decisions so they stay
+visible and reversible. §5 is open and is never closed by inference.
+
+This document covers **the database only**. Anything built to consume it is a
+separate, private concern and is deliberately absent — not the code, and not
+descriptions of it.
 
 ---
+
+## 0. Goal
+
+**Build a comprehensive database that captures all of the syntax, maps it to
+semantic intents, and gets updated as both evolve.**
+
+There is **no completion criterion**, because language does not stop moving —
+syntactically or semantically. New standards land, libraries appear, functions
+are deprecated and removed; and separately the words people use to describe an
+operation shift, and better canonical statements get chosen for ones already
+recorded.
+
+So the measure is not *how much is done* but **how current and comprehensive it
+is**:
+
+- is every language covered scanned against its present state?
+- is anything in the source absent from the database?
+- when the source changes, does the database follow — including removals?
+- does adding new material leave what is already published intact?
+
+A percentage against a denominator the project chose for itself measures
+nothing. Currency against an external source measures something real.
 
 ## 1. What this is
 
@@ -94,6 +120,21 @@ A request may state several operations on several objects. This is served two
 ways: single lookups that a consumer composes, **and** named composites in the
 database for cases where the individual pieces give the wrong answer.
 
+### 2.8 Evolution — derived from §0, not stated by the owner
+
+Marked as derived: these follow from "gets updated as both evolve", but they
+are my reading of it rather than the owner's words.
+
+- **Syntax evolves.** A re-scan must be able to say what changed: what is new,
+  what is gone, what altered its signature. Removals must be recorded as
+  removed, not silently dropped, or the database cannot answer "can I still use
+  this?"
+- **Semantics evolve.** Canonical keys are rewritten as better statements are
+  chosen, and new aliases appear as usage shifts. That must not disturb what is
+  already published.
+- **Provenance is required.** Every record should carry what it was scanned
+  from and when, or currency cannot be assessed — only asserted.
+
 ## 3. Measured state — 2026-08-04
 
 | | |
@@ -126,7 +167,22 @@ standard macro"*, *"param exponential distribution"*, *"expand default value"*.
 Extraction is nearly complete. **Choosing has barely started**, and it is the
 larger body of work.
 
-### 3.2 Other gaps
+### 3.2 Evolution is not built
+
+Against §0, which is the goal rather than a detail:
+
+- **Every rebuild destroys and recreates.** `build_base.py` calls
+  `BASE.unlink()`. There is no history, so no rebuild can report what changed.
+- **Removals are not tracked.** The `std_removed` column exists and is
+  populated **0** times. A function withdrawn from a standard would simply
+  vanish from the database, indistinguishable from one never scanned.
+- **No provenance.** No `scanned_at`, no toolchain version, no source version.
+  Currency cannot be measured, only claimed.
+- **One piece does exist**: alias ownership is pinned and retirement is
+  possible, so new material can be added without moving what is already
+  published. That is evolution infrastructure and it serves §0 directly.
+
+### 3.3 Other gaps
 
 - **Scope assumes bounded.** §2.5 requires all libraries and ecosystems; the
   schema has no package or package-version column.
@@ -182,6 +238,7 @@ recorded once, rather than something every consumer re-derives.
 
 | section | rule |
 |---|---|
+| §0 | the goal; there is no completion criterion by design |
 | §1–§2 | the definition; changed deliberately, not in passing |
 | §3 | measured; re-measured, never recalled |
 | §4 | implementation; reversible, loses to §1–§2 on conflict |
